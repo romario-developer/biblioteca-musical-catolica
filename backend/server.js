@@ -8,7 +8,8 @@ require('dotenv').config();
 const app = express();
 app.use(cors());
 app.use(express.json());
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
 
 // ... (O código de conexão e do Schema continua igual) ...
 mongoose.connect(process.env.MONGODB_URI)
