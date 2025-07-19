@@ -1,0 +1,5 @@
+# Ignorar arquivos de sistema do Node.js
+node_modules
+
+# Ignorar arquivos de ambiente com senhas e chaves secretas
+.env

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca Musical Católica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: rgb(102, 0, 0);
+            overflow-x: hidden;
+        }
+
+        /* Garante que os links que envolvem os cards não tenham a decoração padrão */
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1rem 2rem;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #ffd700, #ffeb3b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        .main-content {
+            margin-top: 80px;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(rgba(234, 6, 241, 0.7), rgba(81, 8, 129, 0.7)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><rect fill="%23654321" width="1200" height="400"/><circle fill="%23ffd700" cx="600" cy="200" r="50" opacity="0.3"/></svg>' );
+            background-size: cover;
+            border-radius: 20px;
+            margin-bottom: 3rem;
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .liturgical-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .liturgical-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .liturgical-card {
+            display: block; /* Importante para que a tag <a> ocupe todo o espaço */
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .liturgical-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .card-description {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        /* Cores Litúrgicas */
+        .advento { --primary-color: #6a1b9a; --secondary-color: #8e24aa; --accent-color: #ab47bc; }
+        .natal { --primary-color: #ffd700; --secondary-color: #ffeb3b; --accent-color: #fff176; }
+        .quaresma { --primary-color: #6a1b9a; --secondary-color: #8e24aa; --accent-color: #ab47bc; }
+        .pascoa { --primary-color: #f8f9fa; --secondary-color: #e9ecef; --accent-color: #ffd700; }
+        .tempo-comum { --primary-color: #2e7d32; --secondary-color: #388e3c; --accent-color: #4caf50; }
+        .especiais { --primary-color: #d32f2f; --secondary-color: #f44336; --accent-color: #ff5722; }
+        .corpus { --primary-color: #d32f8f; --secondary-color: #dadd17; --accent-color: #ff5722; }
+
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🎵 Biblioteca Musical Católica</h1>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <h2>Sua Netflix Católica</h2>
+            <p>Músicas para todos os momentos litúrgicos e espirituais</p>
+        </section>
+
+        <section class="liturgical-section">
+            <h2 class="section-title">Tempos Litúrgicos</h2>
+            <div class="liturgical-grid">
+                
+                <a href="advento.html" class="liturgical-card advento">
+                    <span class="card-icon">🕯️</span>
+                    <h3 class="card-title">Advento</h3>
+                    <p class="card-description">Músicas para o tempo de preparação e esperança</p>
+                </a>
+
+                <a href="natal.html" class="liturgical-card natal">
+                    <span class="card-icon">⭐</span>
+                    <h3 class="card-title">Natal</h3>
+                    <p class="card-description">Celebração do nascimento de Jesus</p>
+                </a>
+
+                <a href="quaresma.html" class="liturgical-card quaresma">
+                    <span class="card-icon">✝️</span>
+                    <h3 class="card-title">Quaresma</h3>
+                    <p class="card-description">Tempo de penitência e conversão</p>
+                </a>
+
+                <a href="pascoa.html" class="liturgical-card pascoa">
+                    <span class="card-icon">🐣</span>
+                    <h3 class="card-title">Páscoa</h3>
+                    <p class="card-description">Celebração da ressurreição</p>
+                </a>
+
+                <a href="tempo-comum.html" class="liturgical-card tempo-comum">
+                    <span class="card-icon">🌱</span>
+                    <h3 class="card-title">Tempo Comum</h3>
+                    <p class="card-description">Crescimento na vida cristã</p>
+                </a>
+
+                <a href="grupo-oracao.html" class="liturgical-card especiais">
+    <span class="card-icon">🎭</span>
+    <h3 class="card-title">Grupo de Oração</h3>
+    <p class="card-description">Músicas para reavivar a fé</p>
+</a>
+<a href="corpus-christi.html" class="liturgical-card corpus"> <!-- Use a classe 'corpus' que você criou -->
+    <span class="card-icon"> 🌱</span> <!-- Ícone de exemplo -->
+    <h3 class="card-title">Corpus Christi</h3>
+    <p class="card-description">Solenidade do Santíssimo Sacramento</p>
+</a>
+
+
+            </div>
+        </section>
+    </main>
+    
+    <!-- Nenhum JavaScript complexo é necessário nesta página -->
+    <script>
+        // Efeito de animação de entrada dos cards
+        window.addEventListener('load', function() {
+            const cards = document.querySelectorAll('.liturgical-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(50px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

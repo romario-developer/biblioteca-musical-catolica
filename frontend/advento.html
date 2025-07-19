@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advento - Biblioteca Musical Católica</title>
+    <style>
+        /* Estilos gerais (copiados do index para consistência) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1rem 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #ffd700, #ffeb3b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        .main-content {
+            padding: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #ab47bc;
+            /* Cor do Advento */
+            padding-left: 1rem;
+        }
+
+        /* Estilos dos itens de momento da missa */
+        .moments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            /* Diminuído para 200px */
+            gap: 1.5rem;
+        }
+
+        .moment-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            /* Diminuído */
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .moment-item h3 {
+            font-size: 1.2rem;
+            /* Diminuído */
+        }
+
+
+        .moment-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+
+        /* Botão de Voltar */
+        .back-button {
+            display: inline-block;
+            margin-top: 3rem;
+            padding: 0.8rem 1.5rem;
+            background-color: #ffd700;
+            color: #1a1a2e;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+
+        .back-button:hover {
+            background-color: #ffeb3b;
+        }
+
+        /* Estilos do Modal (exatamente como antes) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid #ffd700;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-header h2 {
+            background: linear-gradient(45deg, #ffd700, #ffeb3b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        .music-item {
+            display: flex;
+            color: #fff;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .music-title-span {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+
+        .music-item:hover {
+            background: rgba(247, 245, 245, 0.1);
+        }
+
+        .download-btn {
+            background-color: #ffd700;
+            color: #1a1a2e;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background-color: #ffeb3b;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <h1>🎵 Advento</h1>
+    </header>
+
+    <main class="main-content">
+        <h2 class="page-title">Momentos da Missa</h2>
+        <div class="moments-grid">
+            <div class="moment-item" onclick="openMusicList('Entrada')">
+                <h3>Entrada</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Ato Penitencial')">
+                <h3>Ato Penitencial</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Glória')">
+                <h3>Glória</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Aclamação')">
+                <h3>Aclamação</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Ofertório')">
+                <h3>Ofertório</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Santo')">
+                <h3>Santo</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Comunhão')">
+                <h3>Comunhão</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Final')">
+                <h3>Final</h3>
+            </div>
+        </div>
+
+        <a href="index.html" class="back-button">← Voltar para o Início</a>
+    </main>
+
+    <!-- Modal para a Lista de Músicas (HTML) -->
+    <div id="music-list-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-category-title">Categoria</h2>
+                <button class="close-modal-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-music-list" class="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('music-list-modal');
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        async function openMusicList(category) {
+            const modalTitle = document.getElementById('modal-category-title');
+            const musicListContainer = document.getElementById('modal-music-list');
+
+            modalTitle.textContent = `Carregando ${category}...`;
+            musicListContainer.innerHTML = '';
+            modal.classList.add('active');
+
+            try {
+                const tempoLiturgico = 'Advento'; // Definimos o tempo da página
+                const url = `http://localhost:3000/api/musicas?tempo=${encodeURIComponent(tempoLiturgico)}&momento=${encodeURIComponent(category)}`;
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const songs = await response.json();
+                modalTitle.textContent = category;
+
+                if (songs.length > 0) {
+                    musicListContainer.innerHTML = '';
+                    songs.forEach(song => {
+
+                        const item = document.createElement('div');
+                        item.className = 'music-item';
+                        const title = document.createElement('span');
+                        title.className = 'music-title-span'; // Adiciona a classe
+                        title.textContent = song.titulo;
+
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = song.downloadUrl;
+                        downloadLink.textContent = 'Baixar';
+                        downloadLink.className = 'download-btn';
+                        downloadLink.setAttribute('target', '_blank');
+                        downloadLink.setAttribute('download', '');
+                        item.appendChild(title);
+                        item.appendChild(downloadLink);
+                        musicListContainer.appendChild(item);
+                    });
+                } else {
+                    musicListContainer.innerHTML = '<p>Nenhuma música encontrada para esta categoria.</p>';
+                }
+            } catch (error) {
+                console.error('Erro ao buscar músicas:', error);
+                modalTitle.textContent = category;
+                musicListContainer.innerHTML = '<p>Ainda não há músicas para esta categoria.</p>';
+            }
+        }
+    </script>
+</body>
+
+</html>
