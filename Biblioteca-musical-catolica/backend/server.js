@@ -81,9 +81,15 @@ app.get('/api/musicas/all', async (req, res) => {
   try {
     const todasAsMusicas = await Musica.find({});
     res.json(todasAsMusicas);
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao buscar todas as músicas.' });
-  }
+  } // Na rota /api/musicas/all
+catch (error) {
+    console.error("ERRO DETALHADO AO BUSCAR TUDO:", error); // Log detalhado para o Render
+    res.status(500).json({ 
+        message: 'Erro ao buscar todas as músicas.',
+        error_details: error.message // Envia o erro real para o frontend
+    });
+}
+
 });
 
 // ROTA DELETE para excluir uma música
