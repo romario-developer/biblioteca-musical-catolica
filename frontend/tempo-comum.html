@@ -263,7 +263,7 @@
 
             try {
                 const tempoLiturgico = 'Tempo comum'; // Definimos o tempo da página
-                const url = `http://localhost:3000/api/musicas?tempo=${encodeURIComponent(tempoLiturgico)}&momento=${encodeURIComponent(category)}`;
+                const url = `https://biblioteca-musical-catolica.onrender.com/api/musicas?tempo=${encodeURIComponent(tempoLiturgico)}&momento=${encodeURIComponent(category)}`;
 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
