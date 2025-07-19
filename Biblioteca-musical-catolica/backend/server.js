@@ -12,9 +12,15 @@ const PORT = process.env.PORT || 3000;
 
 
 // ... (O código de conexão e do Schema continua igual) ...
+// No topo do arquivo
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Conectado com sucesso ao MongoDB!'))
-  .catch((err) => console.error('Erro ao conectar ao MongoDB:', err));
+  .catch((err) => {
+      console.error('--- ERRO CRÍTICO DE CONEXÃO COM O MONGODB ---');
+      console.error(err);
+      console.error('---------------------------------------------');
+  });
+
 
 const musicaSchema = new mongoose.Schema({
   titulo: String,
