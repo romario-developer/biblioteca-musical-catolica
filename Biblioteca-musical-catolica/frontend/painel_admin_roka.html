@@ -245,7 +245,7 @@ function logout() {
             const tableBody = document.querySelector('#music-table tbody');
             tableBody.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
             try {
-                const response = await fetch('http://localhost:3000/api/musicas/all');
+                const response = await fetch('https://biblioteca-musical-catolica.onrender.com/api/musicas/all');
                 if (!response.ok) throw new Error('Falha ao carregar a lista.');
                 const musicas = await response.json();
                 tableBody.innerHTML = '';
@@ -271,7 +271,7 @@ function logout() {
         async function deleteMusic(id) {
             if (!confirm('Tem certeza que deseja excluir esta música?')) return;
             try {
-                await fetch(`http://localhost:3000/api/musicas/${id}`, { method: 'DELETE' });
+                await fetch(`https://biblioteca-musical-catolica.onrender.com/api/musicas/${id}`, { method: 'DELETE' });
                 loadMusicList(); // Recarrega a lista após a exclusão
             } catch (error) {
                 alert('Erro ao excluir a música.');
@@ -292,7 +292,7 @@ function logout() {
         async function editMusic(id) {
             try {
                 // 1. Busca os dados da música no backend
-                const response = await fetch(`http://localhost:3000/api/musicas/${id}`);
+                const response = await fetch(`https://biblioteca-musical-catolica.onrender.com/api/musicas/${id}`);
                 if (!response.ok) throw new Error('Não foi possível carregar os dados da música.');
                 const musica = await response.json();
 
@@ -344,7 +344,7 @@ function logout() {
             };
 
             try {
-                const response = await fetch(`http://localhost:3000/api/musicas/${id}`, {
+                const response = await fetch(`https://biblioteca-musical-catolica.onrender.com/api/musicas/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dadosAtualizados),
@@ -383,7 +383,7 @@ function logout() {
                 };
 
                 try {
-                    const response = await fetch('http://localhost:3000/api/musicas', {
+                    const response = await fetch('https://biblioteca-musical-catolica.onrender.com/api/musicas', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(musica),
