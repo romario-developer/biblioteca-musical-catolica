@@ -10,56 +10,48 @@ app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
-
-// ... (O código de conexão e do Schema continua igual) ...
-// No topo do arquivo
+// 3. Conexão com o Banco de Dados MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Conectado com sucesso ao MongoDB!'))
   .catch((err) => {
-      console.error('--- ERRO CRÍTICO DE CONEXÃO COM O MONGODB ---');
-      console.error(err);
-      console.error('---------------------------------------------');
+    console.error('--- ERRO CRÍTICO DE CONEXÃO COM O MONGODB ---');
+    console.error(err);
+    console.error('---------------------------------------------');
   });
 
-
+// 4. Definição do Schema e do Modelo da Música
 const musicaSchema = new mongoose.Schema({
   titulo: String,
+  artista: String,
   tempo: String,
   momento: String,
+  tom: String,
   downloadUrl: String,
-  artista: String,
-  tom: String
+  letraUrl: String,      // Campo já estava aqui, o que é bom
+  cifraUrl: String,      // Campo já estava aqui, o que é bom
+  imageUrl: String,
+  previewUrl: String
 });
 const Musica = mongoose.model('Musica', musicaSchema, 'musicas');
 
-
-// 5. Rota GET para BUSCAR músicas (existente)
+// 5. Rota GET para BUSCAR músicas para o site principal
 app.get('/api/musicas', async (req, res) => {
-  // ... (seu código app.get continua aqui, sem alterações)
   const { tempo, momento } = req.query;
   if (!tempo || !momento) {
     return res.status(400).json({ message: 'Parâmetros "tempo" e "momento" são obrigatórios.' });
   }
-  console.log(`Buscando no DB por tempo: "${tempo}" e momento: "${momento}"`);
   try {
     const resultado = await Musica.find({
       tempo: new RegExp('^' + tempo + '$', 'i'),
       momento: new RegExp('^' + momento + '$', 'i')
     });
-
-    if (resultado.length === 0) {
-      console.log('Nenhuma música encontrada para esta combinação.');
-    } else {
-      console.log(`Encontradas ${resultado.length} músicas.`);
-    }
     res.json(resultado);
   } catch (error) {
-    console.error('Erro ao buscar músicas no DB:', error);
     res.status(500).json({ message: 'Erro interno do servidor.' });
   }
 });
 
-// NOVA ROTA POST PARA SALVAR MÚSICAS
+// 6. Rota POST para SALVAR MÚSICAS (CORRIGIDA)
 app.post('/api/musicas', async (req, res) => {
   try {
     const novaMusica = new Musica({
@@ -69,104 +61,77 @@ app.post('/api/musicas', async (req, res) => {
       momento: req.body.momento,
       tom: req.body.tom,
       downloadUrl: req.body.downloadUrl,
+      letraUrl: req.body.letraUrl,      // <-- CORREÇÃO: Adicionado
+      cifraUrl: req.body.cifraUrl,      // <-- CORREÇÃO: Adicionado
+      imageUrl: req.body.imageUrl,
+      previewUrl: req.body.previewUrl
     });
-
-    await novaMusica.save(); // Salva o documento no MongoDB
-
-    console.log('Nova música salva:', novaMusica.titulo);
+    await novaMusica.save();
     res.status(201).json({ message: 'Música salva com sucesso!', data: novaMusica });
-
   } catch (error) {
-    console.error('Erro ao salvar nova música:', error);
     res.status(500).json({ message: 'Erro ao salvar no banco de dados.' });
   }
 });
 
-// ROTA GET para buscar TODAS as músicas para o painel de admin
+// 7. Rota GET para buscar TODAS as músicas para o painel de admin
 app.get('/api/musicas/all', async (req, res) => {
   try {
-    const todasAsMusicas = await Musica.find({});
+    const todasAsMusicas = await Musica.find({}).sort({ tempo: 1, momento: 1, titulo: 1 });
     res.json(todasAsMusicas);
-  } // Na rota /api/musicas/all
-catch (error) {
-    console.error("ERRO DETALHADO AO BUSCAR TUDO:", error); // Log detalhado para o Render
-    res.status(500).json({ 
-        message: 'Erro ao buscar todas as músicas.',
-        error_details: error.message // Envia o erro real para o frontend
-    });
-}
-
+  } catch (error) {
+    console.error("ERRO DETALHADO AO BUSCAR TUDO:", error);
+    res.status(500).json({ message: 'Erro ao buscar todas as músicas.', error_details: error.message });
+  }
 });
 
-// ROTA DELETE para excluir uma música
+// 8. Rota GET para buscar UMA música por ID
+app.get('/api/musicas/:id', async (req, res) => {
+  try {
+    const musica = await Musica.findById(req.params.id);
+    if (!musica) return res.status(404).json({ message: 'Música não encontrada.' });
+    res.json(musica);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao buscar música.' });
+  }
+});
+
+// 9. ROTA PUT para ATUALIZAR uma música por ID (CORRIGIDA)
+app.put('/api/musicas/:id', async (req, res) => {
+  try {
+    // O req.body já contém todos os campos do formulário, incluindo letraUrl e cifraUrl.
+    // O Mongoose é inteligente o suficiente para atualizar apenas os campos presentes.
+    const dadosAtualizados = req.body; 
+
+    const musicaAtualizada = await Musica.findByIdAndUpdate(req.params.id, dadosAtualizados, { new: true });
+    if (!musicaAtualizada) return res.status(404).json({ message: 'Música não encontrada para atualizar.' });
+    res.json({ message: 'Música atualizada com sucesso!', data: musicaAtualizada });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao atualizar no banco de dados.' });
+  }
+});
+
+// 10. ROTA DELETE para excluir uma música
 app.delete('/api/musicas/:id', async (req, res) => {
   try {
-    const id = req.params.id;
-    const resultado = await Musica.findByIdAndDelete(id);
-    if (!resultado) {
-      return res.status(404).json({ message: 'Música não encontrada.' });
-    }
+    const resultado = await Musica.findByIdAndDelete(req.params.id);
+    if (!resultado) return res.status(404).json({ message: 'Música não encontrada.' });
     res.json({ message: 'Música excluída com sucesso.' });
   } catch (error) {
     res.status(500).json({ message: 'Erro ao excluir música.' });
   }
 });
 
-// ROTA GET para buscar UMA música por ID (para o formulário de edição)
-app.get('/api/musicas/:id', async (req, res) => {
-    try {
-        const musica = await Musica.findById(req.params.id);
-        if (!musica) {
-            return res.status(404).json({ message: 'Música não encontrada.' });
-        }
-        res.json(musica);
-    } catch (error) {
-        res.status(500).json({ message: 'Erro ao buscar música.' });
-    }
-});
-
-// ROTA PUT para ATUALIZAR uma música por ID
-app.put('/api/musicas/:id', async (req, res) => {
-    try {
-        const id = req.params.id;
-        const dadosAtualizados = req.body;
-
-        const musicaAtualizada = await Musica.findByIdAndUpdate(id, dadosAtualizados, { new: true });
-        // { new: true } garante que a resposta retorne o documento já atualizado.
-
-        if (!musicaAtualizada) {
-            return res.status(404).json({ message: 'Música não encontrada para atualizar.' });
-        }
-
-        console.log('Música atualizada:', musicaAtualizada.titulo);
-        res.json({ message: 'Música atualizada com sucesso!', data: musicaAtualizada });
-    } catch (error) {
-        console.error('Erro ao atualizar música:', error);
-        res.status(500).json({ message: 'Erro ao atualizar no banco de dados.' });
-    }
-});
-
-// ROTA POST para validar o login
+// 11. ROTA POST para validar o login
 app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
-
-    // Busca as credenciais seguras do arquivo .env
-    const adminUser = process.env.ADMIN_USER;
-    const adminPassword = process.env.ADMIN_PASSWORD;
-
-    if (username === adminUser && password === adminPassword) {
-        // Login bem-sucedido
-        console.log('Login bem-sucedido para o usuário:', username);
-        res.status(200).json({ message: 'Login bem-sucedido!' });
-    } else {
-        // Credenciais inválidas
-        console.log('Tentativa de login falhou para o usuário:', username);
-        res.status(401).json({ message: 'Usuário ou senha inválidos.' });
-    }
+  const { username, password } = req.body;
+  if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASSWORD) {
+    res.status(200).json({ message: 'Login bem-sucedido!' });
+  } else {
+    res.status(401).json({ message: 'Usuário ou senha inválidos.' });
+  }
 });
 
-
-// 6. Iniciar o Servidor
+// 12. Iniciar o Servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}.`);
 });
