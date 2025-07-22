@@ -19,6 +19,16 @@ a {
     text-decoration: none;
 }
 
+/* --- NOVO: Contêiner para centralizar o conteúdo principal --- */
+.main-container {
+    max-width: 1200px;
+    /* Largura máxima do conteúdo */
+    margin: 0 auto;
+    /* Centraliza o contêiner na página */
+    padding: 0 2rem;
+    /* Adiciona um respiro nas laterais */
+}
+
 /* ==========================================================================
    ESTILOS DA PÁGINA INICIAL (index.html)
    ========================================================================== */
@@ -68,9 +78,14 @@ a {
 
 .swiper-container {
     width: 100%;
+    /* Ocupa 100% do .main-container */
     height: 40vh;
     margin-top: -8vh;
     margin-bottom: 3rem;
+    border-radius: 15px;
+    /* Adicionamos o border-radius aqui */
+    overflow: hidden;
+    /* Garante que as imagens respeitem o border-radius */
 }
 
 .swiper-slide {
@@ -120,7 +135,10 @@ a {
 }
 
 .music-shelf {
-    padding: 2rem;
+
+    background-color: #02304e;
+    border-radius: 8px;
+
 }
 
 .shelf-title {
