@@ -467,3 +467,76 @@ a {
     border-color: #ffd700;
     font-weight: bold;
 }
+
+/* ==========================================================================
+   REGRAS DE RESPONSIVIDADE (Media Queries)
+   ========================================================================== */
+
+/* Para telas de tablets e celulares maiores (até 768px) */
+@media (max-width: 768px) {
+    .main-header {
+        padding: 1rem; /* Diminui o espaçamento do header */
+    }
+
+    .hero-section h1 {
+        font-size: 2.5rem; /* Diminui o título principal */
+    }
+
+    .hero-section p {
+        font-size: 1rem; /* Diminui o parágrafo */
+    }
+
+    .shelf-slider-container {
+        padding: 0 1rem; /* Menos espaço nas laterais do slider */
+    }
+
+    .shelf-title {
+        font-size: 1.5rem; /* Diminui o título das seções */
+    }
+
+    .main-container {
+        padding: 0 1rem; /* Menos espaço nas laterais do conteúdo principal */
+    }
+}
+
+/* Para telas de celulares pequenos (até 480px), como o seu de 375px */
+@media (max-width: 480px) {
+    .logo {
+        font-size: 1.5rem; /* Diminui o logo */
+    }
+
+    .hero-section {
+        height: 40vh; /* Menor altura para a seção hero */
+    }
+
+    .hero-section h1 {
+        font-size: 2rem; /* Título ainda menor */
+    }
+
+    .swiper-container {
+        height: 30vh; /* Slider um pouco menor */
+    }
+
+    .shelf-grid {
+        /* Muda para 2 colunas de cards em vez de auto-fill */
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem; /* Menor espaço entre os cards */
+    }
+
+    .card-artwork {
+        height: 120px; /* Imagem/ícone do card menor */
+        font-size: 2rem; /* Ícone do card menor */
+    }
+
+    .card-info {
+        padding: 0.8rem; /* Menos espaçamento dentro do card */
+    }
+
+    .card-title {
+        font-size: 0.9rem; /* Título do card menor */
+    }
+
+    .card-description {
+        font-size: 0.8rem; /* Descrição do card menor */
+    }
+}
