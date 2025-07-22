@@ -55,7 +55,7 @@ a {
 
 .hero-section {
     height: 50vh;
-    background: linear-gradient(to top, #121212 5%, transparent 50%), url('https://images.unsplash.com/photo-1516258242369-933606354238?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+    background: linear-gradient(to top, #4d4a4a 5%, transparent 50%), url('https://media.istockphoto.com/id/1708306721/pt/foto/group-of-people-praying-for-mental-support.jpg?s=1024x1024&w=is&k=20&c=FOS1PJAE-fO5be-1KwxMeuqTXYZPBP20l5d8SLcon98=') no-repeat center center;
     background-size: cover;
     display: flex;
     flex-direction: column;
@@ -79,7 +79,7 @@ a {
 /* --- INÍCIO DOS ESTILOS DO SLIDER DE CARDS (VERSÃO NOVA) --- */
 .shelf-slider-container {
     position: relative; /* Necessário para posicionar as setas */
-    padding: 0 50px;    /* Deixa espaço nas laterais para as setas */
+    padding:  50px;    /* Deixa espaço nas laterais para as setas */
     margin-bottom: 3rem;
 }
 
@@ -105,7 +105,7 @@ a {
 }
 
 .slide-card:hover {
-    background-color: #282828;
+    background-color: rgb(66, 65, 65);
 }
 
 .slide-artwork {
@@ -114,10 +114,15 @@ a {
     background-size: cover;
     background-position: center;
     border-radius: 8px;
+    transition: transform 0.4s ease-in-out;
+}
+
+.slide-card:hover .slide-artwork {
+    transform: scale(1.05); /* Aumenta a imagem em 5% */
 }
 
 .slide-info {
-    padding: 1rem 0.5rem;
+    
     text-align: center;
 }
 
@@ -135,14 +140,9 @@ a {
     transform: translateY(-50%);
     width: 40px;
     height: 40px;
-    background-color: #282828;
     border-radius: 50%;
     color: #fff;
     transition: background-color 0.3s;
-}
-
-.shelf-arrow:hover {
-    background-color: #3e3e3e;
 }
 
 .shelf-arrow::after {
