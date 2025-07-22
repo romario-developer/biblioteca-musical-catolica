@@ -6,8 +6,6 @@ require('dotenv').config();
 
 // 2. Inicialização do App
 const app = express();
-
-// Configuração de CORS
 const corsOptions = {
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -17,14 +15,10 @@ app.use(cors(corsOptions));
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
-// 3. Conexão com o Banco de Dados MongoDB
+// 3. Conexão com o Banco de Dados
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Conectado com sucesso ao MongoDB!'))
-  .catch((err) => {
-    console.error('--- ERRO CRÍTICO DE CONEXÃO COM O MONGODB ---');
-    console.error(err);
-    console.error('---------------------------------------------');
-  });
+  .catch((err) => console.error('--- ERRO CRÍTICO DE CONEXÃO COM O MONGODB ---', err));
 
 // 4. Schemas e Modelos
 const musicaSchema = new mongoose.Schema({
@@ -33,14 +27,10 @@ const musicaSchema = new mongoose.Schema({
 });
 const Musica = mongoose.model('Musica', musicaSchema, 'musicas');
 
-// --- CORREÇÃO: Schema e Modelo para os Destaques ---
 const destaqueSchema = new mongoose.Schema({
-    slides: [{
-        imageUrl: String,
-        linkUrl: String // Opcional
-    }]
+    slides: [{ imageUrl: String, linkUrl: String }]
 });
-const Destaque = mongoose.model('Destaque', destaqueSchema); // O nome do modelo deve ser singular
+const Destaque = mongoose.model('Destaque', destaqueSchema);
 
 // --- ROTAS DA API ---
 
@@ -48,13 +38,8 @@ const Destaque = mongoose.model('Destaque', destaqueSchema); // O nome do modelo
 app.get('/api/destaques', async (req, res) => {
     try {
         let destaquesDoc = await Destaque.findOne({});
-        if (!destaquesDoc) {
-            // Se não existir, retorna um array vazio para não dar erro no frontend
-            return res.json([]); 
-        }
-        res.json(destaquesDoc.slides);
+        res.json(destaquesDoc ? destaquesDoc.slides : []);
     } catch (error) {
-        console.error("Erro ao buscar destaques:", error);
         res.status(500).json({ message: 'Erro ao buscar destaques.' });
     }
 });
@@ -63,33 +48,45 @@ app.get('/api/destaques', async (req, res) => {
 app.post('/api/destaques', async (req, res) => {
     try {
         const { slides } = req.body;
-        if (!Array.isArray(slides)) {
-            return res.status(400).json({ message: 'O corpo da requisição deve conter um array de slides.' });
-        }
-        // Encontra o documento de destaques e o atualiza, ou cria se não existir.
+        if (!Array.isArray(slides)) return res.status(400).json({ message: 'O corpo da requisição deve conter um array de slides.' });
         await Destaque.findOneAndUpdate({}, { slides: slides }, { upsert: true, new: true });
         res.status(200).json({ message: 'Destaques atualizados com sucesso!' });
     } catch (error) {
-        console.error("Erro ao atualizar destaques:", error);
         res.status(500).json({ message: 'Erro ao atualizar destaques.' });
     }
 });
 
-// Rota GET para buscar músicas para o site principal
+// Rota GET para BUSCAR músicas com PAGINAÇÃO
 app.get('/api/musicas', async (req, res) => {
-  const { tempo, momento } = req.query;
-  if (!tempo || !momento) {
-    return res.status(400).json({ message: 'Parâmetros "tempo" e "momento" são obrigatórios.' });
-  }
-  try {
-    const resultado = await Musica.find({
-      tempo: new RegExp('^' + tempo + '$', 'i'),
-      momento: new RegExp('^' + momento + '$', 'i')
-    });
-    res.json(resultado);
-  } catch (error) {
-    res.status(500).json({ message: 'Erro interno do servidor.' });
-  }
+    const { tempo, momento, page = 1, limit = 5 } = req.query;
+
+    if (!tempo || !momento) {
+        return res.status(400).json({ message: 'Parâmetros "tempo" e "momento" são obrigatórios.' });
+    }
+
+    try {
+        const pageNum = parseInt(page);
+        const limitNum = parseInt(limit);
+        const skip = (pageNum - 1) * limitNum;
+
+        const query = {
+            tempo: new RegExp('^' + tempo + '$', 'i'),
+            momento: new RegExp('^' + momento + '$', 'i')
+        };
+
+        const totalMusicas = await Musica.countDocuments(query);
+        const resultado = await Musica.find(query).skip(skip).limit(limitNum);
+
+        res.json({
+            totalPages: Math.ceil(totalMusicas / limitNum),
+            currentPage: pageNum,
+            musicas: resultado
+        });
+
+    } catch (error) {
+        console.error('Erro ao buscar músicas no DB:', error);
+        res.status(500).json({ message: 'Erro interno do servidor.' });
+    }
 });
 
 // Rota POST para SALVAR músicas
@@ -109,8 +106,7 @@ app.get('/api/musicas/all', async (req, res) => {
     const todasAsMusicas = await Musica.find({}).sort({ tempo: 1, momento: 1, titulo: 1 });
     res.json(todasAsMusicas);
   } catch (error) {
-    console.error("ERRO DETALHADO AO BUSCAR TUDO:", error);
-    res.status(500).json({ message: 'Erro ao buscar todas as músicas.', error_details: error.message });
+    res.status(500).json({ message: 'Erro ao buscar todas as músicas.' });
   }
 });
 

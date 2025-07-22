@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advento - Biblioteca Musical Católica</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body>
     <header class="header">
         <h1>🎵 Advento</h1>
@@ -14,14 +16,30 @@
     <main class="main-content">
         <h2 class="page-title">Momentos da Missa</h2>
         <div class="moments-grid">
-            <div class="moment-item" onclick="openMusicList('Entrada')"><h3>Entrada</h3></div>
-            <div class="moment-item" onclick="openMusicList('Ato Penitencial')"><h3>Ato Penitencial</h3></div>
-            <div class="moment-item" onclick="openMusicList('Glória')"><h3>Glória</h3></div>
-            <div class="moment-item" onclick="openMusicList('Aclamação')"><h3>Aclamação</h3></div>
-            <div class="moment-item" onclick="openMusicList('Ofertório')"><h3>Ofertório</h3></div>
-            <div class="moment-item" onclick="openMusicList('Santo')"><h3>Santo</h3></div>
-            <div class="moment-item" onclick="openMusicList('Comunhão')"><h3>Comunhão</h3></div>
-            <div class="moment-item" onclick="openMusicList('Final')"><h3>Final</h3></div>
+            <div class="moment-item" onclick="openMusicList('Entrada')">
+                <h3>Entrada</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Ato Penitencial')">
+                <h3>Ato Penitencial</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Glória')">
+                <h3>Glória</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Aclamação')">
+                <h3>Aclamação</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Ofertório')">
+                <h3>Ofertório</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Santo')">
+                <h3>Santo</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Comunhão')">
+                <h3>Comunhão</h3>
+            </div>
+            <div class="moment-item" onclick="openMusicList('Final')">
+                <h3>Final</h3>
+            </div>
         </div>
         <a href="index.html" class="back-button">← Voltar para o Início</a>
     </main>
@@ -33,6 +51,8 @@
                 <button class="close-modal-btn" onclick="closeModal()">&times;</button>
             </div>
             <div id="modal-music-list" class="modal-body"></div>
+            <!-- NOVO: Container para os botões de paginação -->
+            <div id="modal-pagination" class="pagination-container"></div>
         </div>
     </div>
 
@@ -40,25 +60,30 @@
         const modal = document.getElementById('music-list-modal');
         function closeModal() { modal.classList.remove('active'); }
 
-        async function openMusicList(category) {
+        async function openMusicList(category, page = 1) {
             const modalTitle = document.getElementById('modal-category-title');
             const musicListContainer = document.getElementById('modal-music-list');
+            const paginationContainer = document.getElementById('modal-pagination');
 
-            modalTitle.textContent = `Carregando ${category}...`;
-            musicListContainer.innerHTML = '';
+            musicListContainer.innerHTML = '<p>Carregando...</p>';
+            paginationContainer.innerHTML = '';
             modal.classList.add('active');
+            modalTitle.textContent = category;
 
             try {
                 const tempoLiturgico = 'Advento'; // MUDE AQUI PARA CADA PÁGINA
-                const url = `https://biblioteca-musical-catolica.onrender.com/api/musicas?tempo=${encodeURIComponent(tempoLiturgico )}&momento=${encodeURIComponent(category)}`;
+                const limit = 5;
+                const url = `https://biblioteca-musical-catolica.onrender.com/api/musicas?tempo=${encodeURIComponent(tempoLiturgico)}&momento=${encodeURIComponent(category)}&page=${page}&limit=${limit}`;
+
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-                const songs = await response.json();
-                modalTitle.textContent = category;
+                const data = await response.json();
+                const songs = data.musicas;
+
+                musicListContainer.innerHTML = '';
 
                 if (songs.length > 0) {
-                    musicListContainer.innerHTML = '';
                     songs.forEach(song => {
                         const item = document.createElement('div');
                         item.className = 'music-item';
@@ -71,7 +96,6 @@
                         const buttonsContainer = document.createElement('div');
                         buttonsContainer.className = 'action-buttons';
 
-                        // Botão de Letra (se houver link)
                         if (song.letraUrl) {
                             const letraLink = document.createElement('a');
                             letraLink.href = song.letraUrl;
@@ -81,7 +105,6 @@
                             buttonsContainer.appendChild(letraLink);
                         }
 
-                        // Botão de Cifra (se houver link)
                         if (song.cifraUrl) {
                             const cifraLink = document.createElement('a');
                             cifraLink.href = song.cifraUrl;
@@ -91,7 +114,6 @@
                             buttonsContainer.appendChild(cifraLink);
                         }
 
-                        // Botão de Baixar (sempre presente)
                         const downloadLink = document.createElement('a');
                         downloadLink.href = song.downloadUrl;
                         downloadLink.textContent = 'Baixar';
@@ -99,19 +121,34 @@
                         downloadLink.setAttribute('target', '_blank');
                         downloadLink.setAttribute('download', '');
                         buttonsContainer.appendChild(downloadLink);
-                        
+
                         item.appendChild(buttonsContainer);
                         musicListContainer.appendChild(item);
                     });
+
+                    // LÓGICA PARA CRIAR OS BOTÕES DE PAGINAÇÃO
+                    if (data.totalPages > 1) {
+                        for (let i = 1; i <= data.totalPages; i++) {
+                            const pageBtn = document.createElement('button');
+                            pageBtn.textContent = i;
+                            pageBtn.className = 'pagination-btn';
+                            if (i === data.currentPage) {
+                                pageBtn.classList.add('active');
+                            }
+                            pageBtn.onclick = () => openMusicList(category, i);
+                            paginationContainer.appendChild(pageBtn);
+                        }
+                    }
+
                 } else {
                     musicListContainer.innerHTML = '<p>Nenhuma música encontrada para esta categoria.</p>';
                 }
             } catch (error) {
                 console.error('Erro ao buscar músicas:', error);
-                modalTitle.textContent = category;
                 musicListContainer.innerHTML = '<p>Ainda não há músicas para esta categoria.</p>';
             }
         }
     </script>
 </body>
+
 </html>
