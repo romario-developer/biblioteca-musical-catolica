@@ -1,19 +1,30 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca Musical Católica - Início</title>
+    <link rel="stylesheet" href="assets/css/style.css">
     <style>
         /* Reset Básico e Fontes */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: #121212;
             color: #ffffff;
             overflow-x: hidden;
         }
-        a { color: inherit; text-decoration: none; }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
 
         /* Header Superior */
         .main-header {
@@ -27,13 +38,20 @@
             justify-content: space-between;
             align-items: center;
         }
-        .logo { font-size: 1.5rem; font-weight: bold; }
-        .logo span { color: #ffd700; }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #ffd700;
+        }
 
         /* Seção Herói */
         .hero-section {
             height: 50vh;
-            background: linear-gradient(to top, #121212 5%, transparent 50%), url('https://images.unsplash.com/photo-1516258242369-933606354238?q=80&w=2070&auto=format&fit=crop' ) no-repeat center center;
+            background: linear-gradient(to top, #121212 5%, transparent 50%), url('https://images.unsplash.com/photo-1516258242369-933606354238?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
             background-size: cover;
             display: flex;
             flex-direction: column;
@@ -42,18 +60,29 @@
             text-align: center;
             padding: 2rem;
         }
-        .hero-section h1 { font-size: 3rem; text-shadow: 2px 2px 8px rgba(0,0,0,0.7); }
-        .hero-section p { font-size: 1.2rem; margin-top: 1rem; max-width: 600px; }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            max-width: 600px;
+        }
 
         /* Estilo das Seções de Música */
         .music-shelf {
             padding: 2rem;
         }
+
         .shelf-title {
             font-size: 1.8rem;
             font-weight: bold;
             margin-bottom: 1.5rem;
         }
+
         .shelf-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -68,10 +97,12 @@
             transition: background-color 0.3s, transform 0.3s;
             cursor: pointer;
         }
+
         .category-card:hover {
             background-color: #282828;
             transform: translateY(-5px);
         }
+
         .card-artwork {
             height: 180px;
             background-size: cover;
@@ -79,51 +110,107 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem; /* Ícone grande */
+            font-size: 3rem;
+            /* Ícone grande */
         }
+
         .card-info {
             padding: 1rem;
         }
+
         .card-title {
             font-weight: bold;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         .card-description {
             font-size: 0.9rem;
             color: #b3b3b3;
             margin-top: 0.5rem;
         }
-        
-        /* Cores e Imagens de Fundo para os Cards */
-        .card-advento .card-artwork { background-color: #6a1b9a; }
-        .card-natal .card-artwork { background-color: #ffd700; }
-        .card-quaresma .card-artwork { background-color: #8e24aa; }
-        .card-pascoa .card-artwork { background-color: #f8f9fa; color: #121212; }
-        .card-comum .card-artwork { background-color: #2e7d32; }
-        .card-especiais .card-artwork { background-color: #d32f2f; }
-        .card-corpus .card-artwork { background-color: #dadd17; color: #121212; }
 
+        /* Cores e Imagens de Fundo para os Cards */
+        .card-advento .card-artwork {
+            background-color: #6a1b9a;
+        }
+
+        .card-natal .card-artwork {
+            background-color: #ffd700;
+        }
+
+        .card-quaresma .card-artwork {
+            background-color: #8e24aa;
+        }
+
+        .card-pascoa .card-artwork {
+            background-color: #f8f9fa;
+            color: #121212;
+        }
+
+        .card-comum .card-artwork {
+            background-color: #2e7d32;
+        }
+
+        .card-especiais .card-artwork {
+            background-color: #d32f2f;
+        }
+
+        .card-corpus .card-artwork {
+            background-color: #dadd17;
+            color: #121212;
+        }
+
+        .card-pentencostes .card-artwork {
+            background-color: #b30b0b;
+
+        }
+
+        .card-casamento .card-artwork {
+            background-color: #b30b0b;
+
+        }
     </style>
+
+    <!-- Links para o Swiper.js -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 </head>
+
 <body>
 
     <header class="main-header">
-        <div class="logo">Holy<span>Tracks</span></div>
+        <div class="logo"><img src="assets/img/#" alt="" class="slogan">Holy<span>Tracks</span></div>
         <!-- Futuros links de navegação podem ir aqui -->
     </header>
 
     <main>
         <section class="hero-section">
             <h1>Sua Biblioteca de Músicas Católicas</h1>
-            <p>Encontre multitracks, cifras e playbacks para todos os momentos da sua missão.</p>
+            <p>Encontre multitracks, letras e cifras para todos os momentos da sua missão.</p>
         </section>
+
+        <!-- INÍCIO DA NOVA SEÇÃO DE SLIDER -->
+        <section class="slider-container">
+            <h2 class="section-title">Destaques</h2>
+            <div class="swiper-container">
+                <div class="swiper-wrapper" id="slider-destaques">
+                    <!-- As imagens do slider serão inseridas aqui pelo JavaScript -->
+                </div>
+                <!-- Adiciona as setas de navegação -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+                <!-- Adiciona a paginação (bolinhas ) -->
+                <div class="swiper-pagination"></div>
+            </div>
+        </section>
+        <!-- FIM DA NOVA SEÇÃO DE SLIDER -->
 
         <section class="music-shelf">
             <h2 class="shelf-title">Tempos Litúrgicos</h2>
             <div class="shelf-grid">
-                
+
                 <a href="advento.html" class="category-card card-advento">
                     <div class="card-artwork">🕯️</div>
                     <div class="card-info">
@@ -186,7 +273,23 @@
                         <div class="card-description">Solenidade</div>
                     </div>
                 </a>
-                
+
+                <a href="pentencostes.html" class="category-card card-pentencostes">
+                    <div class="card-artwork">🕊️</div>
+                    <div class="card-info">
+                        <div class="card-title">Pentencostes</div>
+                        <div class="card-description">Solenidade</div>
+                    </div>
+                </a>
+
+                <a href="casamento.html" class="category-card card-casamento">
+                    <div class="card-artwork">👰‍♀️🤵‍♂️</div>
+                    <div class="card-info">
+                        <div class="card-title">Casamento</div>
+                        <div class="card-description">Cerimônia</div>
+                    </div>
+                </a>
+
                 <!-- Adicione outros cards aqui (Ex: Casamentos, Batismos) -->
 
             </div>
@@ -194,5 +297,62 @@
 
     </main>
 
+    <script>
+        // Função para carregar os destaques e inicializar o slider
+        async function carregarDestaques() {
+            try {
+                // No futuro, buscaremos isso do backend. Por enquanto, usamos dados de exemplo.
+                // ...
+const response = await fetch('https://biblioteca-musical-catolica.onrender.com/api/destaques' );
+if (!response.ok) throw new Error('Não foi possível carregar os destaques.');
+const destaques = await response.json();
+
+// Se não houver destaques, não inicializa o slider
+if (destaques.length === 0) {
+    document.querySelector('.slider-container').style.display = 'none';
+    return;
+}
+// ...
+
+
+                const sliderWrapper = document.getElementById('slider-destaques');
+                sliderWrapper.innerHTML = ''; // Limpa o conteúdo
+
+                destaques.forEach(destaque => {
+                    const slide = document.createElement('div');
+                    slide.className = 'swiper-slide';
+                    slide.innerHTML = `<img src="${destaque.imageUrl}" alt="Destaque">`;
+                    sliderWrapper.appendChild(slide);
+                });
+
+                // Inicializa o Swiper
+                const swiper = new Swiper('.swiper-container', {
+                    loop: true,
+                    pagination: {
+                        el: '.swiper-pagination',
+                        clickable: true,
+                    },
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                    autoplay: {
+                        delay: 5000, // Passa o slide a cada 5 segundos
+                        disableOnInteraction: false,
+                    },
+                });
+
+            } catch (error) {
+                console.error('Erro ao carregar destaques:', error);
+            }
+        }
+
+        // Chama a função quando a página carregar
+        document.addEventListener('DOMContentLoaded', carregarDestaques);
+    </script>
 </body>
+
+
+</body>
+
 </html>

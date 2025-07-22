@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <title>Painel de Administração</title>
@@ -11,40 +10,29 @@
             window.location.href = 'login.html';
         }
     </script>
-
 </head>
-
 <body>
     <div class="container">
-        <button onclick="logout()"
-            style="background-color: #e74c3c; color: white; width: auto; float: right;">Sair</button>
+        <button onclick="logout()" style="background-color: #e74c3c; color: white; width: auto; float: right;">Sair</button>
         <h1>Painel de Administração</h1>
         <div class="tabs">
-            <button class="tab-button active" onclick="showTab('add')">Adicionar Música</button>
-            <button class="tab-button" onclick="showTab('manage')">Gerenciar Músicas</button>
+            <button class="tab-button active" onclick="showTab(event, 'add')">Adicionar Música</button>
+            <button class="tab-button" onclick="showTab(event, 'manage')">Gerenciar Músicas</button>
+            <button class="tab-button" onclick="showTab(event, 'slider')">Gerenciar Slider</button>
         </div>
 
-        <!-- Aba de Adicionar Música (HTML FIXO E CORRIGIDO) -->
+        <!-- Aba de Adicionar Música -->
         <div id="add" class="tab-content active">
             <h2>Adicionar Nova Música</h2>
             <form id="add-music-form">
-                <div class="form-group"><label for="add-titulo">Título</label><input type="text" id="add-titulo"
-                        required></div>
-                <div class="form-group"><label for="add-artista">Artista</label><input type="text" id="add-artista">
-                </div>
-                <div class="form-group"><label for="add-tempo">Tempo/Categoria</label><select id="add-tempo" required>
-                        <option value="" disabled selected>Selecione uma categoria</option>
-                    </select></div>
-                <div class="form-group"><label for="add-momento">Momento</label><input type="text" id="add-momento"
-                        list="add-momentos-lista" placeholder="Selecione uma categoria primeiro" required><datalist
-                        id="add-momentos-lista"></datalist></div>
+                <div class="form-group"><label for="add-titulo">Título</label><input type="text" id="add-titulo" required></div>
+                <div class="form-group"><label for="add-artista">Artista</label><input type="text" id="add-artista"></div>
+                <div class="form-group"><label for="add-tempo">Tempo/Categoria</label><select id="add-tempo" required><option value="" disabled selected>Selecione uma categoria</option></select></div>
+                <div class="form-group"><label for="add-momento">Momento</label><input type="text" id="add-momento" list="add-momentos-lista" placeholder="Selecione uma categoria primeiro" required><datalist id="add-momentos-lista"></datalist></div>
                 <div class="form-group"><label for="add-tom">Tom</label><input type="text" id="add-tom"></div>
-                <div class="form-group"><label for="add-downloadUrl">Link de Download (Multitrack)</label><input
-                        type="url" id="add-downloadUrl" required></div>
-                <div class="form-group"><label for="add-letraUrl">Link da Letra</label><input type="url"
-                        id="add-letraUrl"></div>
-                <div class="form-group"><label for="add-cifraUrl">Link da Cifra</label><input type="url"
-                        id="add-cifraUrl"></div>
+                <div class="form-group"><label for="add-downloadUrl">Link de Download (Multitrack)</label><input type="url" id="add-downloadUrl" required></div>
+                <div class="form-group"><label for="add-letraUrl">Link da Letra</label><input type="url" id="add-letraUrl"></div>
+                <div class="form-group"><label for="add-cifraUrl">Link da Cifra</label><input type="url" id="add-cifraUrl"></div>
                 <button type="submit">Salvar Música</button>
             </form>
         </div>
@@ -54,15 +42,20 @@
             <h2>Músicas Cadastradas</h2>
             <table id="music-table">
                 <thead>
-                    <tr>
-                        <th>Título</th>
-                        <th>Tempo/Categoria</th>
-                        <th>Momento</th>
-                        <th>Ações</th>
-                    </tr>
+                    <tr><th>Título</th><th>Tempo/Categoria</th><th>Momento</th><th>Ações</th></tr>
                 </thead>
                 <tbody></tbody>
             </table>
+        </div>
+
+        <!-- Aba de Gerenciar Slider -->
+        <div id="slider" class="tab-content">
+            <h2>Gerenciar Slides de Destaque</h2>
+            <form id="slider-form">
+                <p>Insira até 6 URLs de imagem para os slides. Deixe em branco os que não quiser usar.</p>
+                <div id="slider-inputs"></div>
+                <button type="submit">Salvar Slides</button>
+            </form>
         </div>
     </div>
 
@@ -75,7 +68,7 @@
         </div>
     </div>
 
+    <!-- LINK CORRETO PARA O ARQUIVO JAVASCRIPT -->
     <script src="assets/js/admin.js"></script>
 </body>
-
 </html>

@@ -3,23 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grupo de Oração - Biblioteca Musical Católica</title>
+    <title> Casamento - Biblioteca Musical Católica</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
     <header class="header">
-        <h1>🎵 Grupo de Oração</h1>
+        <h1>🎵 Casamento</h1>
     </header>
 
     <main class="main-content">
-        <h2 class="page-title">Momentos</h2>
+        <h2 class="page-title">Momentos da Cerimônia</h2>
         <div class="moments-grid">
-            <div class="moment-item" onclick="openMusicList('Animação')"><h3>Animação</h3></div>
-            <div class="moment-item" onclick="openMusicList('Louvor')"><h3>Louvor</h3></div>
-            <div class="moment-item" onclick="openMusicList('Espírito Santo')"><h3>Espírito Santo</h3></div>
-            <div class="moment-item" onclick="openMusicList('Perdão')"><h3>Perdão</h3></div>
-            <div class="moment-item" onclick="openMusicList('Pós-Pregação')"><h3>Pós-Pregação</h3></div>
-            <div class="moment-item" onclick="openMusicList('Final')"><h3>Final</h3></div>
+            <div class="moment-item" onclick="openMusicList('Entrada dos padrinhos')"><h3>Entrada dos padrinhos</h3></div>
+            <div class="moment-item" onclick="openMusicList('Entrada do noivo')"><h3>Entrada do noivo</h3></div>
+            <div class="moment-item" onclick="openMusicList('Entrada da noiva')"><h3>Entrada da noiva</h3></div>
+            <div class="moment-item" onclick="openMusicList('Bênção das alianças')"><h3>Bênção das alianças</h3></div>
+            <div class="moment-item" onclick="openMusicList('Assinaturas')"><h3>Assinaturas</h3></div>
+            <div class="moment-item" onclick="openMusicList('Saída dos noivos')"><h3>Saída dos noivos</h3></div>
+            <div class="moment-item" onclick="openMusicList('Comunhão')"><h3>Comunhão</h3></div>
+            <div class="moment-item" onclick="openMusicList('Outros')"><h3>Outros</h3></div>
         </div>
         <a href="index.html" class="back-button">← Voltar para o Início</a>
     </main>
@@ -47,7 +49,7 @@
             modal.classList.add('active');
 
             try {
-                const tempoLiturgico = 'Grupo de Oração'; // MUDE AQUI PARA CADA PÁGINA
+                const tempoLiturgico = 'Casamento'; // MUDE AQUI PARA CADA PÁGINA
                 const url = `https://biblioteca-musical-catolica.onrender.com/api/musicas?tempo=${encodeURIComponent(tempoLiturgico )}&momento=${encodeURIComponent(category)}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);

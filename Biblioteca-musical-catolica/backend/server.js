@@ -6,7 +6,14 @@ require('dotenv').config();
 
 // 2. Inicialização do App
 const app = express();
-app.use(cors());
+
+// Configuração de CORS
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
@@ -19,22 +26,56 @@ mongoose.connect(process.env.MONGODB_URI)
     console.error('---------------------------------------------');
   });
 
-// 4. Definição do Schema e do Modelo da Música
+// 4. Schemas e Modelos
 const musicaSchema = new mongoose.Schema({
-  titulo: String,
-  artista: String,
-  tempo: String,
-  momento: String,
-  tom: String,
-  downloadUrl: String,
-  letraUrl: String,      // Campo já estava aqui, o que é bom
-  cifraUrl: String,      // Campo já estava aqui, o que é bom
-  imageUrl: String,
-  previewUrl: String
+  titulo: String, artista: String, tempo: String, momento: String, tom: String,
+  downloadUrl: String, letraUrl: String, cifraUrl: String, imageUrl: String, previewUrl: String
 });
 const Musica = mongoose.model('Musica', musicaSchema, 'musicas');
 
-// 5. Rota GET para BUSCAR músicas para o site principal
+// --- CORREÇÃO: Schema e Modelo para os Destaques ---
+const destaqueSchema = new mongoose.Schema({
+    slides: [{
+        imageUrl: String,
+        linkUrl: String // Opcional
+    }]
+});
+const Destaque = mongoose.model('Destaque', destaqueSchema); // O nome do modelo deve ser singular
+
+// --- ROTAS DA API ---
+
+// Rota GET para buscar os slides
+app.get('/api/destaques', async (req, res) => {
+    try {
+        let destaquesDoc = await Destaque.findOne({});
+        if (!destaquesDoc) {
+            // Se não existir, retorna um array vazio para não dar erro no frontend
+            return res.json([]); 
+        }
+        res.json(destaquesDoc.slides);
+    } catch (error) {
+        console.error("Erro ao buscar destaques:", error);
+        res.status(500).json({ message: 'Erro ao buscar destaques.' });
+    }
+});
+
+// Rota POST para atualizar os slides
+app.post('/api/destaques', async (req, res) => {
+    try {
+        const { slides } = req.body;
+        if (!Array.isArray(slides)) {
+            return res.status(400).json({ message: 'O corpo da requisição deve conter um array de slides.' });
+        }
+        // Encontra o documento de destaques e o atualiza, ou cria se não existir.
+        await Destaque.findOneAndUpdate({}, { slides: slides }, { upsert: true, new: true });
+        res.status(200).json({ message: 'Destaques atualizados com sucesso!' });
+    } catch (error) {
+        console.error("Erro ao atualizar destaques:", error);
+        res.status(500).json({ message: 'Erro ao atualizar destaques.' });
+    }
+});
+
+// Rota GET para buscar músicas para o site principal
 app.get('/api/musicas', async (req, res) => {
   const { tempo, momento } = req.query;
   if (!tempo || !momento) {
@@ -51,21 +92,10 @@ app.get('/api/musicas', async (req, res) => {
   }
 });
 
-// 6. Rota POST para SALVAR MÚSICAS (CORRIGIDA)
+// Rota POST para SALVAR músicas
 app.post('/api/musicas', async (req, res) => {
   try {
-    const novaMusica = new Musica({
-      titulo: req.body.titulo,
-      artista: req.body.artista,
-      tempo: req.body.tempo,
-      momento: req.body.momento,
-      tom: req.body.tom,
-      downloadUrl: req.body.downloadUrl,
-      letraUrl: req.body.letraUrl,      // <-- CORREÇÃO: Adicionado
-      cifraUrl: req.body.cifraUrl,      // <-- CORREÇÃO: Adicionado
-      imageUrl: req.body.imageUrl,
-      previewUrl: req.body.previewUrl
-    });
+    const novaMusica = new Musica(req.body);
     await novaMusica.save();
     res.status(201).json({ message: 'Música salva com sucesso!', data: novaMusica });
   } catch (error) {
@@ -73,7 +103,7 @@ app.post('/api/musicas', async (req, res) => {
   }
 });
 
-// 7. Rota GET para buscar TODAS as músicas para o painel de admin
+// Rota GET para buscar TODAS as músicas para o painel de admin
 app.get('/api/musicas/all', async (req, res) => {
   try {
     const todasAsMusicas = await Musica.find({}).sort({ tempo: 1, momento: 1, titulo: 1 });
@@ -84,7 +114,7 @@ app.get('/api/musicas/all', async (req, res) => {
   }
 });
 
-// 8. Rota GET para buscar UMA música por ID
+// Rota GET para buscar UMA música por ID
 app.get('/api/musicas/:id', async (req, res) => {
   try {
     const musica = await Musica.findById(req.params.id);
@@ -95,14 +125,10 @@ app.get('/api/musicas/:id', async (req, res) => {
   }
 });
 
-// 9. ROTA PUT para ATUALIZAR uma música por ID (CORRIGIDA)
+// Rota PUT para ATUALIZAR uma música por ID
 app.put('/api/musicas/:id', async (req, res) => {
   try {
-    // O req.body já contém todos os campos do formulário, incluindo letraUrl e cifraUrl.
-    // O Mongoose é inteligente o suficiente para atualizar apenas os campos presentes.
-    const dadosAtualizados = req.body; 
-
-    const musicaAtualizada = await Musica.findByIdAndUpdate(req.params.id, dadosAtualizados, { new: true });
+    const musicaAtualizada = await Musica.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!musicaAtualizada) return res.status(404).json({ message: 'Música não encontrada para atualizar.' });
     res.json({ message: 'Música atualizada com sucesso!', data: musicaAtualizada });
   } catch (error) {
@@ -110,7 +136,7 @@ app.put('/api/musicas/:id', async (req, res) => {
   }
 });
 
-// 10. ROTA DELETE para excluir uma música
+// Rota DELETE para excluir uma música
 app.delete('/api/musicas/:id', async (req, res) => {
   try {
     const resultado = await Musica.findByIdAndDelete(req.params.id);
@@ -121,7 +147,7 @@ app.delete('/api/musicas/:id', async (req, res) => {
   }
 });
 
-// 11. ROTA POST para validar o login
+// Rota POST para validar o login
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASSWORD) {
@@ -131,7 +157,7 @@ app.post('/api/login', (req, res) => {
   }
 });
 
-// 12. Iniciar o Servidor
+// Iniciar o Servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}.`);
 });
