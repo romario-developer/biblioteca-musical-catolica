@@ -76,63 +76,89 @@ a {
     max-width: 600px;
 }
 
-.swiper-container {
-    width: 100%;
-    /* Ocupa 100% do .main-container */
-    height: 40vh;
-    margin-top: -8vh;
+/* --- INÍCIO DOS ESTILOS DO SLIDER DE CARDS (VERSÃO NOVA) --- */
+.shelf-slider-container {
+    position: relative; /* Necessário para posicionar as setas */
+    padding: 0 50px;    /* Deixa espaço nas laterais para as setas */
     margin-bottom: 3rem;
-    border-radius: 15px;
-    /* Adicionamos o border-radius aqui */
-    overflow: hidden;
-    /* Garante que as imagens respeitem o border-radius */
+}
+
+.swiper {
+    width: 100%;
+    height: auto; /* A altura será definida pelo conteúdo */
+    overflow: visible; /* Permite ver os cards que estão "saindo" da tela */
 }
 
 .swiper-slide {
-    text-align: center;
-    font-size: 18px;
-    background: #282828;
+    background: transparent;
+    height: auto;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
 }
 
-.swiper-slide img {
+.slide-card {
     display: block;
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: background-color 0.3s;
+}
+
+.slide-card:hover {
+    background-color: #282828;
+}
+
+.slide-artwork {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    padding-top: 100%; /* Cria um quadrado perfeito para a imagem (aspect-ratio 1:1) */
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
 }
 
-.swiper-button-next,
-.swiper-button-prev {
-    color: #ffd700;
-    background-color: rgba(0, 0, 0, 0.2);
+.slide-info {
+    padding: 1rem 0.5rem;
+    text-align: center;
+}
+
+.slide-title {
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Estilos das setas de navegação */
+.shelf-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: #282828;
     border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    transition: background-color 0.3s, opacity 0.3s;
-    opacity: 0;
+    color: #fff;
+    transition: background-color 0.3s;
 }
 
-.swiper-container:hover .swiper-button-next,
-.swiper-container:hover .swiper-button-prev {
-    opacity: 1;
+.shelf-arrow:hover {
+    background-color: #3e3e3e;
 }
 
-.swiper-button-next:hover,
-.swiper-button-prev:hover {
-    background-color: rgba(0, 0, 0, 0.5);
+.shelf-arrow::after {
+    font-size: 1rem; /* Tamanho do ícone da seta */
+    font-weight: bold;
 }
 
-.swiper-button-next::after,
-.swiper-button-prev::after {
-    font-size: 1.5rem;
+.swiper-button-prev.shelf-arrow {
+    left: 0;
 }
 
-.swiper-pagination-bullet-active {
-    background: #ffd700;
+.swiper-button-next.shelf-arrow {
+    right: 0;
 }
+/* --- FIM DOS ESTILOS DO SLIDER DE CARDS --- */
+
 
 .music-shelf {
 

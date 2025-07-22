@@ -24,7 +24,7 @@ const API_URL = 'https://biblioteca-musical-catolica.onrender.com';
 
 // --- FUNÇÕES DE UTILIDADE E MANIPULAÇÃO DO DOM ---
 
-function logout( ) {
+function logout() {
     sessionStorage.removeItem('isAuthenticated');
     window.location.href = 'login.html';
 }
@@ -103,7 +103,7 @@ async function editMusic(id) {
         if (!response.ok) throw new Error('Não foi possível carregar os dados da música.');
         const musica = await response.json();
         editForm.innerHTML = `<input type="hidden" id="edit-id" value="${musica._id}"><div class="form-group"><label for="edit-titulo">Título</label><input type="text" id="edit-titulo" value="${musica.titulo || ''}" required></div><div class="form-group"><label for="edit-artista">Artista</label><input type="text" id="edit-artista" value="${musica.artista || ''}"></div><div class="form-group"><label for="edit-tempo">Tempo/Categoria</label><select id="edit-tempo" required></select></div><div class="form-group"><label for="edit-momento">Momento</label><input type="text" id="edit-momento" list="edit-momentos-lista" value="${musica.momento || ''}" required><datalist id="edit-momentos-lista"></datalist></div><div class="form-group"><label for="edit-tom">Tom</label><input type="text" id="edit-tom" value="${musica.tom || ''}"></div><div class="form-group"><label for="edit-downloadUrl">Link de Download (Multitrack)</label><input type="url" id="edit-downloadUrl" value="${musica.downloadUrl || ''}" required></div><div class="form-group"><label for="edit-letraUrl">Link da Letra</label><input type="url" id="edit-letraUrl" value="${musica.letraUrl || ''}"></div><div class="form-group"><label for="edit-cifraUrl">Link da Cifra</label><input type="url" id="edit-cifraUrl" value="${musica.cifraUrl || ''}"></div><button type="submit">Salvar Alterações</button>`;
-        
+
         const tempoSelect = document.getElementById('edit-tempo');
         const tempos = Object.keys(momentosPorCategoria);
         tempos.forEach(t => {
@@ -113,10 +113,10 @@ async function editMusic(id) {
             if (t === musica.tempo) option.selected = true;
             tempoSelect.appendChild(option);
         });
-        
+
         atualizarSugestoesDeMomento(tempoSelect.value, 'edit-momentos-lista');
         tempoSelect.addEventListener('change', () => atualizarSugestoesDeMomento(tempoSelect.value, 'edit-momentos-lista'));
-        
+
         editModal.style.display = 'block';
     } catch (error) {
         alert(error.message);
@@ -154,19 +154,26 @@ function criarInputsSlider() {
     container.innerHTML = '';
     for (let i = 1; i <= 6; i++) {
         const div = document.createElement('div');
-        div.className = 'form-group';
-        div.innerHTML = `<label for="slide-url-${i}">URL da Imagem do Slide ${i}</label><input type="url" id="slide-url-${i}" placeholder="https://exemplo.com/imagem.jpg">`;
-        container.appendChild(div );
+        div.className = 'form-group slider-group'; // Adiciona uma classe para estilização
+        div.innerHTML = `
+            <label>Slide ${i}</label>
+            <input type="url" id="slide-image-url-${i}" placeholder="URL da Imagem">
+            <input type="url" id="slide-link-url-${i}" placeholder="URL do Link (opcional)">
+        `;
+        container.appendChild(div);
     }
 }
+
 
 async function carregarSlidesAtuais() {
     try {
         const response = await fetch(`${API_URL}/api/destaques`);
         const slides = await response.json();
         slides.forEach((slide, index) => {
-            const input = document.getElementById(`slide-url-${index + 1}`);
-            if (input) input.value = slide.imageUrl;
+            const imgInput = document.getElementById(`slide-image-url-${index + 1}`);
+            const linkInput = document.getElementById(`slide-link-url-${index + 1}`);
+            if (imgInput) imgInput.value = slide.imageUrl;
+            if (linkInput) linkInput.value = slide.linkUrl || '';
         });
     } catch (error) {
         console.error('Erro ao carregar slides:', error);
@@ -177,9 +184,13 @@ document.getElementById('slider-form').addEventListener('submit', async (event) 
     event.preventDefault();
     const slidesParaSalvar = [];
     for (let i = 1; i <= 6; i++) {
-        const input = document.getElementById(`slide-url-${i}`);
-        if (input && input.value.trim() !== '') {
-            slidesParaSalvar.push({ imageUrl: input.value.trim() });
+        const imgInput = document.getElementById(`slide-image-url-${i}`);
+        const linkInput = document.getElementById(`slide-link-url-${i}`);
+        if (imgInput && imgInput.value.trim() !== '') {
+            slidesParaSalvar.push({
+                imageUrl: imgInput.value.trim(),
+                linkUrl: linkInput.value.trim()
+            });
         }
     }
     try {
@@ -211,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         option.textContent = t;
         tempoSelectAdd.appendChild(option);
     });
-    
+
     tempoSelectAdd.addEventListener('change', () => {
         document.getElementById('add-momento').placeholder = 'Ex: Entrada, Comunhão, Animação...';
         atualizarSugestoesDeMomento(tempoSelectAdd.value, 'add-momentos-lista');

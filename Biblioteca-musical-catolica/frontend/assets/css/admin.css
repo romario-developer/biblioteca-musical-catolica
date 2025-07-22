@@ -51,6 +51,18 @@ h1 {
     margin-bottom: 1rem;
 }
 
+.slider-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.slider-group label {
+    grid-column: 1 / -1; /* Faz o label ocupar a linha toda */
+}
+
+
 label {
     display: block;
     margin-bottom: 0.5rem;
