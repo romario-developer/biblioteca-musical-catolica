@@ -171,12 +171,15 @@ a {
     font-size: 1.8rem;
     font-weight: bold;
     margin-bottom: 1.5rem;
+    padding-top: 2rem;
+    text-align: center;
 }
 
 .shelf-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1.5rem;
+    align-items: center;
 }
 
 .category-card {
