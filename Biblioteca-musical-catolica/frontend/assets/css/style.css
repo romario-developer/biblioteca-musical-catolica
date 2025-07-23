@@ -54,8 +54,7 @@ h3,
 
 /* Header */
 .main-header {
-    background-color: #4A5568;
-    opacity: 80%;
+    background-color: #000000;
     backdrop-filter: blur(10px);
     padding: 1rem 2rem;
     position: sticky;
@@ -182,13 +181,15 @@ h3,
     transform: translateY(-50%);
     width: 40px;
     height: 40px;
+    background-color: rgba(45, 55, 72, 0.8);
     border-radius: 50%;
     color: #fff;
     transition: background-color 0.3s;
-    
 }
 
-
+.shelf-arrow:hover {
+    background-color: var(--bg-secondary);
+}
 
 .shelf-arrow::after {
     font-size: 1rem;
@@ -545,6 +546,147 @@ h3,
     background-color: #128C7E;
 }
 
+/* ==========================================================================
+   ESTILOS DA PÁGINA BIBLIOTECA
+   ========================================================================== */
+.page-header {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.page-header h1 {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+}
+
+.page-header p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 2rem auto;
+}
+
+.search-bar-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+#search-input {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 50px;
+    border: 2px solid var(--bg-secondary);
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    transition: border-color 0.3s;
+}
+
+#search-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.music-library {
+    padding-bottom: 4rem;
+}
+
+
+/* ==========================================================================
+   ESTILOS DA PÁGINA REPERTÓRIO
+   ========================================================================== */
+.repertorio-accordion {
+    max-width: 900px;
+    margin: 0 auto 4rem auto;
+}
+
+.accordion-item {
+    background-color: var(--bg-secondary);
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.accordion-header {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    padding: 1.5rem;
+    font-size: 1.2rem;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    text-align: left;
+}
+
+.accordion-icon {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+    padding: 0 1.5rem;
+}
+
+.accordion-item.active .accordion-content {
+    max-height: 1000px; /* Um valor alto para permitir a expansão */
+    padding: 0 1.5rem 1.5rem 1.5rem;
+    transition: max-height 0.5s ease-in, padding 0.5s ease-in;
+}
+
+.repertorio-momento {
+    font-size: 1.1rem;
+    color: var(--accent-color);
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.repertorio-accordion ul {
+    list-style: none;
+    padding-left: 1rem;
+}
+
+.repertorio-accordion li {
+    padding: 0.5rem 0;
+    color: var(--text-secondary);
+}
+
+.repertorio-accordion li em {
+    color: #8899a6; /* Um pouco mais sutil */
+    font-style: normal;
+}
+
+/* Adicionar este bloco no final da seção de repertório */
+.suggest-again-btn {
+    display: block;
+    margin: 1.5rem auto 0 auto;
+    padding: 0.6rem 1.2rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.9rem;
+    background-color: transparent;
+    color: var(--accent-color);
+    border: 2px solid var(--accent-color);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.suggest-again-btn:hover {
+    background-color: var(--accent-color);
+    color: var(--bg-primary);
+}
+
+
 /* Responsividade */
 @media (max-width: 768px) {
     .main-header {
@@ -618,3 +760,4 @@ h3,
         font-size: 0.8rem;
     }
 }
+

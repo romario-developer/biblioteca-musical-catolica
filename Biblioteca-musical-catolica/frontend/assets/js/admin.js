@@ -8,16 +8,13 @@ if (sessionStorage.getItem('isAuthenticated') !== 'true') {
 
 // Mapeamento de momentos por categoria
 const momentosPorCategoria = {
-    'Advento': ['Entrada', 'Ato Penitencial', 'Glória', 'Aclamação', 'Ofertório', 'Santo', 'Comunhão', 'Final'],
-    'Natal': ['Entrada', 'Ato Penitencial', 'Glória', 'Aclamação', 'Ofertório', 'Santo', 'Comunhão', 'Final'],
-    'Quaresma': ['Entrada', 'Ato Penitencial', 'Aclamação', 'Ofertório', 'Santo', 'Comunhão', 'Final'],
-    'Páscoa': ['Entrada', 'Ato Penitencial', 'Glória', 'Aclamação', 'Ofertório', 'Santo', 'Comunhão', 'Final'],
-    'Tempo Comum': ['Entrada', 'Ato Penitencial', 'Glória', 'Aclamação', 'Ofertório', 'Santo', 'Comunhão', 'Final'],
-    'Corpus Christi': ['Entrada', 'Ato Penitencial', 'Glória', 'Aclamação', 'Ofertório', 'Santo', 'Comunhão', 'Final'],
-    'Pentecostes': ['Entrada', 'Ato Penitencial', 'Glória', 'Aclamação', 'Ofertório', 'Santo', 'Comunhão', 'Final'],
-    'Casamento': ['Entrada do Noivo', 'Entrada da Noiva', 'Bênção das Alianças', 'Comunhão', 'Assinaturas', 'Saída'],
-    'Grupo de Oração': ['Animação', 'Louvor', 'Espírito Santo', 'Adoração', 'Perdão', 'Pós-pregação', 'Mariana']
+    'Missa': ['Entrada', 'Ato Penitencial', 'Glória', 'Salmo', 'Aclamação', 'Ofertório', 'Santo', 'Cordeiro', 'Comunhão', 'Final'],
+    'Grupo de Oração': ['Animação', 'Louvor', 'Espírito Santo', 'Adoração', 'Perdão', 'Pós-pregação', 'Mariana'],
+    'Casamento': ['Entrada do Noivo', 'Entrada da Noiva', 'Bênção das Alianças', 'Comunhão', 'Assinaturas', 'Saída']
 };
+
+// Lista de Tempos Litúrgicos (para não depender das chaves do objeto acima)
+const temposLiturgicos = ['Advento', 'Natal', 'Quaresma', 'Páscoa', 'Tempo Comum', 'Corpus Christi', 'Pentecostes'];
 
 // URL base da API
 const API_URL = 'https://biblioteca-musical-catolica.onrender.com';
@@ -105,8 +102,10 @@ async function editMusic(id) {
         editForm.innerHTML = `<input type="hidden" id="edit-id" value="${musica._id}"><div class="form-group"><label for="edit-titulo">Título</label><input type="text" id="edit-titulo" value="${musica.titulo || ''}" required></div><div class="form-group"><label for="edit-artista">Artista</label><input type="text" id="edit-artista" value="${musica.artista || ''}"></div><div class="form-group"><label for="edit-tempo">Tempo/Categoria</label><select id="edit-tempo" required></select></div><div class="form-group"><label for="edit-momento">Momento</label><input type="text" id="edit-momento" list="edit-momentos-lista" value="${musica.momento || ''}" required><datalist id="edit-momentos-lista"></datalist></div><div class="form-group"><label for="edit-tom">Tom</label><input type="text" id="edit-tom" value="${musica.tom || ''}"></div><div class="form-group"><label for="edit-downloadUrl">Link de Download (Multitrack)</label><input type="url" id="edit-downloadUrl" value="${musica.downloadUrl || ''}" required></div><div class="form-group"><label for="edit-letraUrl">Link da Letra</label><input type="url" id="edit-letraUrl" value="${musica.letraUrl || ''}"></div><div class="form-group"><label for="edit-cifraUrl">Link da Cifra</label><input type="url" id="edit-cifraUrl" value="${musica.cifraUrl || ''}"></div><button type="submit">Salvar Alterações</button>`;
 
         const tempoSelect = document.getElementById('edit-tempo');
-        const tempos = Object.keys(momentosPorCategoria);
-        tempos.forEach(t => {
+        const todasCategorias = [...temposLiturgicos, ...Object.keys(momentosPorCategoria)];
+        const categoriasUnicas = [...new Set(todasCategorias)]; // Remove duplicatas
+
+        categoriasUnicas.forEach(t => {
             const option = document.createElement('option');
             option.value = t;
             option.textContent = t;
@@ -154,16 +153,11 @@ function criarInputsSlider() {
     container.innerHTML = '';
     for (let i = 1; i <= 6; i++) {
         const div = document.createElement('div');
-        div.className = 'form-group slider-group'; // Adiciona uma classe para estilização
-        div.innerHTML = `
-            <label>Slide ${i}</label>
-            <input type="url" id="slide-image-url-${i}" placeholder="URL da Imagem">
-            <input type="url" id="slide-link-url-${i}" placeholder="URL do Link (opcional)">
-        `;
+        div.className = 'form-group slider-group';
+        div.innerHTML = `<label>Slide ${i}</label><input type="url" id="slide-image-url-${i}" placeholder="URL da Imagem"><input type="url" id="slide-link-url-${i}" placeholder="URL do Link (opcional)">`;
         container.appendChild(div);
     }
 }
-
 
 async function carregarSlidesAtuais() {
     try {
@@ -215,8 +209,10 @@ document.addEventListener('DOMContentLoaded', () => {
     messageDiv.style.marginTop = '1rem';
     addForm.after(messageDiv);
 
-    const tempos = Object.keys(momentosPorCategoria);
-    tempos.forEach(t => {
+    const todasCategorias = [...temposLiturgicos, ...Object.keys(momentosPorCategoria)];
+    const categoriasUnicas = [...new Set(todasCategorias)];
+
+    categoriasUnicas.forEach(t => {
         const option = document.createElement('option');
         option.value = t;
         option.textContent = t;

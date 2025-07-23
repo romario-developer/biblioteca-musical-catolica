@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repertórios - HolyTracks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <a href="index.html" class="logo">Holy<span>Tracks</span></a>
+        <nav class="main-nav">
+            <a href="index.html">Início</a>
+            <a href="biblioteca.html">Biblioteca</a>
+            <a href="repertorio.html">Repertório</a>
+            <a href="participe.html" class="nav-button">Seja Membro</a>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <section class="page-header">
+            <h1>Sugestões de Repertório</h1>
+            <p>Listas prontas e aleatórias para cada tempo litúrgico, facilitando o seu planejamento.</p>
+        </section>
+
+        <section id="repertorio-container" class="repertorio-accordion">
+            <!-- O conteúdo do acordeão será inserido aqui pelo JavaScript -->
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <!-- O mesmo footer do index.html -->
+        <div class="main-container footer-content">
+            <div class="footer-social">
+                <a href="https://instagram.com/seu_usuario" target="_blank" title="Instagram"><img src="https://img.icons8.com/ios-filled/50/A0AEC0/instagram-new.png" alt="Instagram"/></a>
+                <a href="https://youtube.com/seu_canal" target="_blank" title="YouTube"><img src="https://img.icons8.com/ios-filled/50/A0AEC0/youtube-play.png" alt="YouTube"/></a>
+                <a href="mailto:suporte@holytracks.com" title="Suporte por E-mail"><img src="https://img.icons8.com/ios-filled/50/A0AEC0/mail.png" alt="Suporte"/></a>
+            </div>
+            <div class="footer-copyright">
+                <p>&copy; 2025 HolyTracks. Todos os direitos reservados.</p>
+            </div>
+            <div class="footer-whatsapp">
+                <a href="https://wa.me/5511999999999" target="_blank">Fale Conosco no WhatsApp</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', ( ) => {
+            const repertorioContainer = document.getElementById('repertorio-container');
+            let todasAsMusicas = []; // Armazena todas as músicas para não recarregar
+
+            // --- NOVA LÓGICA ---
+            const ordemMomentosMissa = ['Entrada', 'Ato Penitencial', 'Glória', 'Salmo', 'Aclamação', 'Ofertório', 'Santo', 'Cordeiro', 'Comunhão', 'Final'];
+
+            // Função para gerar e exibir o repertório de um tempo específico
+            function gerarRepertorio(tempo, musicasDoTempo) {
+                let momentosParaExibir = [...ordemMomentosMissa];
+
+                // Regra específica: Omitir "Glória" na Quaresma
+                if (tempo === 'Quaresma') {
+                    momentosParaExibir = momentosParaExibir.filter(m => m !== 'Glória');
+                }
+
+                let contentHtml = '';
+                momentosParaExibir.forEach(momento => {
+                    const musicasDisponiveis = musicasDoTempo[momento] || [];
+                    let musicaSugerida = 'Nenhuma música encontrada';
+
+                    if (musicasDisponiveis.length > 0) {
+                        // Escolhe uma música aleatoriamente
+                        const randomIndex = Math.floor(Math.random() * musicasDisponiveis.length);
+                        const musica = musicasDisponiveis[randomIndex];
+                        musicaSugerida = `${musica.titulo} - <em>${musica.artista || ''}</em>`;
+                    }
+                    
+                    contentHtml += `<h4 class="repertorio-momento">${momento}</h4><ul><li>${musicaSugerida}</li></ul>`;
+                });
+                return contentHtml;
+            }
+
+            // Função principal que carrega os dados e monta o acordeão
+            async function carregarRepertorios() {
+                try {
+                    repertorioContainer.innerHTML = '<p>Carregando repertórios...</p>';
+                    const response = await fetch('https://biblioteca-musical-catolica.onrender.com/api/musicas/all' );
+                    if (!response.ok) throw new Error('Falha ao carregar os dados.');
+                    
+                    todasAsMusicas = await response.json();
+
+                    // Agrupa TODAS as músicas por Tempo e depois por Momento
+                    const repertorios = todasAsMusicas.reduce((acc, musica) => {
+                        const tempo = musica.tempo || 'Outros';
+                        const momento = musica.momento || 'Outros';
+                        if (!acc[tempo]) acc[tempo] = {};
+                        if (!acc[tempo][momento]) acc[tempo][momento] = [];
+                        acc[tempo][momento].push(musica);
+                        return acc;
+                    }, {});
+
+                    repertorioContainer.innerHTML = ''; // Limpa a mensagem de "carregando"
+
+                    // Cria o HTML do acordeão
+                    for (const tempo in repertorios) {
+                        // Ignora a categoria "Grupo de Oração" nesta página
+                        if (tempo === 'Grupo de Oração') continue;
+
+                        const item = document.createElement('div');
+                        item.className = 'accordion-item';
+
+                        const header = document.createElement('button');
+                        header.className = 'accordion-header';
+                        header.innerHTML = `<span>${tempo}</span><span class="accordion-icon">+</span>`;
+                        
+                        const content = document.createElement('div');
+                        content.className = 'accordion-content';
+                        
+                        // Gera o conteúdo inicial
+                        content.innerHTML = gerarRepertorio(tempo, repertorios[tempo]);
+
+                        // Adiciona o botão de "Sugerir Novamente"
+                        const suggestButton = document.createElement('button');
+                        suggestButton.className = 'suggest-again-btn';
+                        suggestButton.textContent = 'Sugerir Novamente';
+                        suggestButton.onclick = (event) => {
+                            event.stopPropagation(); // Impede que o acordeão feche ao clicar
+                            content.innerHTML = gerarRepertorio(tempo, repertorios[tempo]);
+                            content.appendChild(suggestButton); // Readiciona o botão
+                        };
+                        content.appendChild(suggestButton);
+
+                        header.addEventListener('click', () => {
+                            item.classList.toggle('active');
+                            const icon = header.querySelector('.accordion-icon');
+                            icon.textContent = item.classList.contains('active') ? '−' : '+';
+                        });
+
+                        item.appendChild(header);
+                        item.appendChild(content);
+                        repertorioContainer.appendChild(item);
+                    }
+
+                } catch (error) {
+                    repertorioContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
+                }
+            }
+
+            carregarRepertorios();
+        });
+    </script>
+</body>
+</html>

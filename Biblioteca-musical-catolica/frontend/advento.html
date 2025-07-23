@@ -5,57 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advento - Biblioteca Musical Católica</title>
-
-    <!-- Novas Fontes do Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600&display=swap"
         rel="stylesheet">
-
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
-    <header class="header">
-        <h1>🎵 Advento</h1>
+    <header class="main-header">
+        <a href="index.html" class="logo">Holy<span>Tracks</span></a>
+        <nav class="main-nav">
+            <a href="index.html">Início</a>
+            <a href="biblioteca.html">Biblioteca</a>
+            <a href="repertorio.html">Repertório</a>
+            <a href="participe.html" class="nav-button">Seja Membro</a>
+        </nav>
     </header>
 
-    <main class="main-content">
-        <h2 class="page-title">Momentos da Missa</h2>
-        <div class="moments-grid">
-            <div class="moment-item" onclick="openMusicList('Entrada' )">
-                <h3>Entrada</h3>
-            </div>
-            <div class="moment-item" onclick="openMusicList('Ato Penitencial')">
-                <h3>Ato Penitencial</h3>
-            </div>
-            <div class="moment-item" onclick="openMusicList('Glória')">
-                <h3>Glória</h3>
-            </div>
-            <div class="moment-item" onclick="openMusicList('Aclamação')">
-                <h3>Aclamação</h3>
-            </div>
-            <div class="moment-item" onclick="openMusicList('Ofertório')">
-                <h3>Ofertório</h3>
-            </div>
-            <div class="moment-item" onclick="openMusicList('Santo')">
-                <h3>Santo</h3>
-            </div>
-            <div class="moment-item" onclick="openMusicList('Comunhão')">
-                <h3>Comunhão</h3>
-            </div>
-            <div class="moment-item" onclick="openMusicList('Final')">
-                <h3>Final</h3>
-            </div>
+    <main class="main-container">
+        <section class="page-header">
+            <h1>Advento</h1>
+            <p>Músicas para o tempo de preparação e esperança.</p>
+        </section>
+
+        <div id="moments-container" class="moments-grid">
+            <!-- Cards dos momentos serão inseridos aqui -->
         </div>
-        <a href="index.html" class="back-button">← Voltar para o Início</a>
+
+        <a href="index.html" class="back-button" style="margin: 3rem auto 0; display: table;">← Voltar para o Início</a>
     </main>
 
     <div id="music-list-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modal-category-title">Categoria</h2>
-                <button class="close-modal-btn" onclick="closeModal()">&times;</button>
+                <button class="close-modal-btn" onclick="closeModal( )">&times;</button>
             </div>
             <div id="modal-music-list" class="modal-body"></div>
             <div id="modal-pagination" class="pagination-container"></div>
@@ -65,6 +50,29 @@
     <script>
         const modal = document.getElementById('music-list-modal');
         function closeModal() { modal.classList.remove('active'); }
+
+        // --- NOVA LÓGICA DE ORDENAÇÃO ---
+        const ordemMomentosMissa = ['Entrada', 'Ato Penitencial', 'Glória', 'Salmo', 'Aclamação', 'Ofertório', 'Santo', 'Cordeiro', 'Comunhão', 'Final'];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const momentsContainer = document.getElementById('moments-container');
+            let momentosParaExibir = [...ordemMomentosMissa];
+
+            // Regra específica: Omitir "Glória" na Quaresma
+            // (Para o Advento, o Glória é mantido, mas a lógica estaria aqui se fosse a página da Quaresma)
+            // if (tempoLiturgico === 'Quaresma') {
+            //     momentosParaExibir = momentosParaExibir.filter(m => m !== 'Glória');
+            // }
+
+            momentosParaExibir.forEach(momento => {
+                const item = document.createElement('div');
+                item.className = 'moment-item';
+                item.setAttribute('onclick', `openMusicList('${momento}')`);
+                item.innerHTML = `<h3>${momento}</h3>`;
+                momentsContainer.appendChild(item);
+            });
+        });
+        // --- FIM DA NOVA LÓGICA ---
 
         async function openMusicList(category, page = 1) {
             const modalTitle = document.getElementById('modal-category-title');
