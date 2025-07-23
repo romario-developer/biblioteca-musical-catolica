@@ -1,4 +1,4 @@
-// --- LÓGICA COMPLETA E CORRIGIDA PARA O PAINEL DE ADMIN ---
+// --- LÓGICA COMPLETA E FINAL PARA O PAINEL DE ADMIN ---
 
 // Verifica a autenticação no início de tudo
 if (sessionStorage.getItem('isAuthenticated') !== 'true') {
@@ -27,13 +27,12 @@ function formatarTexto(str) {
     return str.trim().split(' ').map(palavra => palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase()).join(' ');
 }
 
-function atualizarSugestoesDeMomento(categoria, datalistElementId) {
-    const datalist = document.getElementById(datalistElementId);
-    const inputMomento = document.querySelector(`input[list="${datalistElementId}"]`);
-    if (!datalist || !inputMomento) return;
-    
-    datalist.innerHTML = '';
-    inputMomento.value = ''; // Limpa o campo de texto
+// CORREÇÃO: Função reescrita para popular um <select>
+function popularSelectDeMomentos(categoria, selectElementId) {
+    const selectMomento = document.getElementById(selectElementId);
+    if (!selectMomento) return;
+
+    selectMomento.innerHTML = ''; // Limpa as opções antigas
     
     let momentos = [];
     if (temposLiturgicos.includes(categoria)) {
@@ -42,14 +41,21 @@ function atualizarSugestoesDeMomento(categoria, datalistElementId) {
         momentos = momentosPorCategoria[categoria] || [];
     }
 
+    // Adiciona a opção padrão
+    const defaultOption = document.createElement('option');
+    defaultOption.value = "";
+    defaultOption.textContent = "Selecione um momento";
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    selectMomento.appendChild(defaultOption);
+
+    // Adiciona as opções da lista
     momentos.forEach(momento => {
         const option = document.createElement('option');
         option.value = momento;
-        datalist.appendChild(option);
+        option.textContent = momento;
+        selectMomento.appendChild(option);
     });
-
-    // Atualiza o placeholder para guiar o usuário
-    inputMomento.placeholder = momentos.length > 0 ? 'Selecione ou digite um momento' : 'Digite um momento';
 }
 
 function showTab(event, tabName) {
@@ -58,12 +64,8 @@ function showTab(event, tabName) {
     document.getElementById(tabName).classList.add('active');
     event.currentTarget.classList.add('active');
 
-    if (tabName === 'manage') {
-        loadMusicList();
-    } else if (tabName === 'slider') {
-        criarInputsSlider();
-        carregarSlidesAtuais();
-    }
+    if (tabName === 'manage') loadMusicList();
+    else if (tabName === 'slider') criarInputsSlider();
 }
 
 // --- FUNÇÕES DE MÚSICA (CRUD) ---
@@ -108,7 +110,8 @@ async function editMusic(id) {
         const response = await fetch(`${API_URL}/api/musicas/${id}`);
         if (!response.ok) throw new Error('Não foi possível carregar os dados da música.');
         const musica = await response.json();
-        editForm.innerHTML = `<input type="hidden" id="edit-id" value="${musica._id}"><div class="form-group"><label for="edit-titulo">Título</label><input type="text" id="edit-titulo" value="${musica.titulo || ''}" required></div><div class="form-group"><label for="edit-artista">Artista</label><input type="text" id="edit-artista" value="${musica.artista || ''}"></div><div class="form-group"><label for="edit-tempo">Tempo/Categoria</label><select id="edit-tempo" required></select></div><div class="form-group"><label for="edit-momento">Momento</label><input type="text" id="edit-momento" list="edit-momentos-lista" value="${musica.momento || ''}" required><datalist id="edit-momentos-lista"></datalist></div><div class="form-group"><label for="edit-tom">Tom</label><input type="text" id="edit-tom" value="${musica.tom || ''}"></div><div class="form-group"><label for="edit-downloadUrl">Link de Download (Multitrack)</label><input type="url" id="edit-downloadUrl" value="${musica.downloadUrl || ''}" required></div><div class="form-group"><label for="edit-letraUrl">Link da Letra</label><input type="url" id="edit-letraUrl" value="${musica.letraUrl || ''}"></div><div class="form-group"><label for="edit-cifraUrl">Link da Cifra</label><input type="url" id="edit-cifraUrl" value="${musica.cifraUrl || ''}"></div><button type="submit">Salvar Alterações</button>`;
+        
+        editForm.innerHTML = `<input type="hidden" id="edit-id" value="${musica._id}"><div class="form-group"><label for="edit-titulo">Título</label><input type="text" id="edit-titulo" value="${musica.titulo || ''}" required></div><div class="form-group"><label for="edit-artista">Artista</label><input type="text" id="edit-artista" value="${musica.artista || ''}"></div><div class="form-group"><label for="edit-tempo">Tempo/Categoria</label><select id="edit-tempo" required></select></div><div class="form-group"><label for="edit-momento">Momento</label><select id="edit-momento" required></select></div><div class="form-group"><label for="edit-tom">Tom</label><input type="text" id="edit-tom" value="${musica.tom || ''}"></div><div class="form-group"><label for="edit-downloadUrl">Link de Download (Multitrack)</label><input type="url" id="edit-downloadUrl" value="${musica.downloadUrl || ''}" required></div><div class="form-group"><label for="edit-letraUrl">Link da Letra</label><input type="url" id="edit-letraUrl" value="${musica.letraUrl || ''}"></div><div class="form-group"><label for="edit-cifraUrl">Link da Cifra</label><input type="url" id="edit-cifraUrl" value="${musica.cifraUrl || ''}"></div><button type="submit">Salvar Alterações</button>`;
 
         const tempoSelect = document.getElementById('edit-tempo');
         const todasCategorias = [...temposLiturgicos, ...Object.keys(momentosPorCategoria).filter(k => k !== 'Missa')];
@@ -122,8 +125,10 @@ async function editMusic(id) {
             tempoSelect.appendChild(option);
         });
 
-        atualizarSugestoesDeMomento(tempoSelect.value, 'edit-momentos-lista');
-        tempoSelect.addEventListener('change', () => atualizarSugestoesDeMomento(tempoSelect.value, 'edit-momentos-lista'));
+        popularSelectDeMomentos(tempoSelect.value, 'edit-momento');
+        document.getElementById('edit-momento').value = musica.momento; // Seleciona o momento atual
+        
+        tempoSelect.addEventListener('change', () => popularSelectDeMomentos(tempoSelect.value, 'edit-momento'));
 
         editModal.style.display = 'block';
     } catch (error) {
@@ -159,13 +164,14 @@ editForm.addEventListener('submit', async (event) => {
 
 function criarInputsSlider() {
     const container = document.getElementById('slider-inputs');
-    container.innerHTML = '';
+    if (container.innerHTML !== '') return; // Evita recriar os inputs
     for (let i = 1; i <= 6; i++) {
         const div = document.createElement('div');
         div.className = 'form-group slider-group';
         div.innerHTML = `<label>Slide ${i}</label><input type="url" id="slide-image-url-${i}" placeholder="URL da Imagem"><input type="url" id="slide-link-url-${i}" placeholder="URL do Link (opcional)">`;
         container.appendChild(div);
     }
+    carregarSlidesAtuais();
 }
 
 async function carregarSlidesAtuais() {
@@ -190,18 +196,11 @@ document.getElementById('slider-form').addEventListener('submit', async (event) 
         const imgInput = document.getElementById(`slide-image-url-${i}`);
         const linkInput = document.getElementById(`slide-link-url-${i}`);
         if (imgInput && imgInput.value.trim() !== '') {
-            slidesParaSalvar.push({
-                imageUrl: imgInput.value.trim(),
-                linkUrl: linkInput.value.trim()
-            });
+            slidesParaSalvar.push({ imageUrl: imgInput.value.trim(), linkUrl: linkInput.value.trim() });
         }
     }
     try {
-        const response = await fetch(`${API_URL}/api/destaques`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ slides: slidesParaSalvar }),
-        });
+        const response = await fetch(`${API_URL}/api/destaques`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slides: slidesParaSalvar }) });
         if (!response.ok) throw new Error('Falha ao salvar os slides.');
         alert('Slides atualizados com sucesso!');
     } catch (error) {
@@ -228,9 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
         tempoSelectAdd.appendChild(option);
     });
 
-    // <<<--- CORREÇÃO APLICADA AQUI ---<<<
+    // CORREÇÃO FINAL: Adiciona o "ouvinte" ao select de categoria
     tempoSelectAdd.addEventListener('change', () => {
-        atualizarSugestoesDeMomento(tempoSelectAdd.value, 'add-momentos-lista');
+        popularSelectDeMomentos(tempoSelectAdd.value, 'add-momento');
     });
 
     addForm.addEventListener('submit', async (event) => {
@@ -261,3 +260,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
