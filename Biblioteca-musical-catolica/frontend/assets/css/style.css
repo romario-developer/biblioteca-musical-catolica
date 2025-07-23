@@ -1,6 +1,16 @@
 /* ==========================================================================
-   ESTILOS GERAIS E RESET
+   NOVA IDENTIDADE VISUAL: VARIÁVEIS E RESET
    ========================================================================== */
+:root {
+    --bg-primary: #1A202C;
+    --bg-secondary: #2D3748;
+    --text-primary: #E2E8F0;
+    --text-secondary: #A0AEC0;
+    --accent-color: #FFD700;
+    --font-heading: 'Poppins', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -8,9 +18,9 @@
 }
 
 body {
-    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #121212;
-    color: #ffffff;
+    font-family: var(--font-body);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     overflow-x: hidden;
 }
 
@@ -19,43 +29,48 @@ a {
     text-decoration: none;
 }
 
-/* --- NOVO: Contêiner para centralizar o conteúdo principal --- */
-.main-container {
-    max-width: 1200px;
-    /* Largura máxima do conteúdo */
-    margin: 0 auto;
-    /* Centraliza o contêiner na página */
-    padding: 0 2rem;
-    /* Adiciona um respiro nas laterais */
+h1,
+h2,
+h3,
+.logo {
+    font-family: var(--font-heading);
+    font-size: 30px;
 }
 
 /* ==========================================================================
-   ESTILOS DA PÁGINA INICIAL (index.html)
+   COMPONENTES GERAIS
    ========================================================================== */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* Header */
 .main-header {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: #4A5568;
+    opacity: 80%;
     backdrop-filter: blur(10px);
     padding: 1rem 2rem;
     position: sticky;
     top: 0;
     z-index: 1000;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo {
-    font-size: 2rem;
-    font-weight: bold;
 }
 
 .logo span {
-    color: #ffd700;
+    color: var(--accent-color);
 }
 
+/* Seção Hero */
 .hero-section {
     height: 50vh;
-    background: linear-gradient(to top, #4d4a4a 5%, transparent 50%), url('https://media.istockphoto.com/id/1708306721/pt/foto/group-of-people-praying-for-mental-support.jpg?s=1024x1024&w=is&k=20&c=FOS1PJAE-fO5be-1KwxMeuqTXYZPBP20l5d8SLcon98=') no-repeat center center;
+    background: linear-gradient(to top, var(--bg-primary) 5%, transparent 50%), url('https://images.unsplash.com/photo-1516258242369-933606354238?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
     background-size: cover;
     display: flex;
     flex-direction: column;
@@ -74,43 +89,46 @@ a {
     font-size: 1.2rem;
     margin-top: 1rem;
     max-width: 600px;
+    color: var(--text-secondary);
 }
 
-/* --- INÍCIO DOS ESTILOS DO SLIDER DE CARDS (VERSÃO NOVA) --- */
-.shelf-slider-container {
-    position: relative; /* Necessário para posicionar as setas */
-    padding:  50px;    /* Deixa espaço nas laterais para as setas */
+/* ==========================================================================
+   NOVO LAYOUT DO SLIDER
+   ========================================================================== */
+.featured-section {
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: -8vh;
     margin-bottom: 3rem;
+    position: relative;
+    z-index: 10;
+}
+
+.shelf-slider-container {
+    position: relative;
+    padding: 0 50px;
 }
 
 .swiper {
     width: 100%;
-    height: auto; /* A altura será definida pelo conteúdo */
-    overflow: visible; /* Permite ver os cards que estão "saindo" da tela */
+    height: auto;
+    overflow: visible;
 }
 
 .swiper-slide {
     background: transparent;
-    height: auto;
-    display: flex;
-    flex-direction: column;
 }
 
 .slide-card {
     display: block;
-    background-color: #1e1e1e;
     border-radius: 8px;
     overflow: hidden;
-    transition: background-color 0.3s;
-}
-
-.slide-card:hover {
-    background-color: rgb(66, 65, 65);
 }
 
 .slide-artwork {
     width: 100%;
-    padding-top: 100%; /* Cria um quadrado perfeito para a imagem (aspect-ratio 1:1) */
+    padding-top: 100%;
     background-size: cover;
     background-position: center;
     border-radius: 8px;
@@ -118,35 +136,27 @@ a {
 }
 
 .slide-card:hover .slide-artwork {
-    transform: scale(1.05); /* Aumenta a imagem em 5% */
+    transform: scale(1.05);
 }
 
-.slide-info {
-    
-    text-align: center;
-}
-
-.slide-title {
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Estilos das setas de navegação */
 .shelf-arrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     width: 40px;
     height: 40px;
+    background-color: rgba(45, 55, 72, 0.8);
     border-radius: 50%;
     color: #fff;
     transition: background-color 0.3s;
 }
 
+.shelf-arrow:hover {
+    background-color: var(--bg-secondary);
+}
+
 .shelf-arrow::after {
-    font-size: 1rem; /* Tamanho do ícone da seta */
+    font-size: 1rem;
     font-weight: bold;
 }
 
@@ -157,34 +167,22 @@ a {
 .swiper-button-next.shelf-arrow {
     right: 0;
 }
-/* --- FIM DOS ESTILOS DO SLIDER DE CARDS --- */
 
-
+/* ==========================================================================
+   PRATELEIRAS DE MÚSICA
+   ========================================================================== */
 .music-shelf {
-
-    background-color: #02304e;
-    border-radius: 8px;
-    padding-left: 10%;
-
-}
-
-.shelf-title {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 1.5rem;
-    padding-top: 2rem;
-    text-align: center;
+    margin-bottom: 3rem;
 }
 
 .shelf-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1.5rem;
-    align-items: center;
 }
 
 .category-card {
-    background-color: #1e1e1e;
+    background-color: var(--bg-secondary);
     border-radius: 8px;
     overflow: hidden;
     transition: background-color 0.3s, transform 0.3s;
@@ -192,7 +190,7 @@ a {
 }
 
 .category-card:hover {
-    background-color: #282828;
+    background-color: #4A5568;
     transform: translateY(-5px);
 }
 
@@ -211,15 +209,12 @@ a {
 }
 
 .card-title {
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-weight: 600;
 }
 
 .card-description {
     font-size: 0.9rem;
-    color: #b3b3b3;
+    color: var(--text-secondary);
     margin-top: 0.5rem;
 }
 
@@ -262,17 +257,17 @@ a {
 }
 
 /* ==========================================================================
-   ESTILOS DAS PÁGINAS DE CATEGORIA (advento.html, natal.html, etc.)
+   ESTILOS DAS PÁGINAS DE CATEGORIA (advento.html, etc.)
    ========================================================================== */
 .header {
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(26, 32, 44, 0.7);
     padding: 1rem 2rem;
     backdrop-filter: blur(10px);
 }
 
 .header h1 {
     font-size: 2rem;
-    background: linear-gradient(45deg, #ffd700, #ffeb3b);
+    background: linear-gradient(45deg, var(--accent-color), #ffeb3b);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -286,7 +281,7 @@ a {
 .page-title {
     font-size: 2.5rem;
     margin-bottom: 2rem;
-    border-left: 4px solid #ab47bc;
+    border-left: 4px solid var(--accent-color);
     padding-left: 1rem;
 }
 
@@ -297,7 +292,7 @@ a {
 }
 
 .moment-item {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-secondary);
     padding: 1.5rem;
     border-radius: 10px;
     text-align: center;
@@ -313,7 +308,7 @@ a {
 }
 
 .moment-item:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: #4A5568;
     transform: translateY(-5px);
 }
 
@@ -321,11 +316,11 @@ a {
     display: inline-block;
     margin-top: 3rem;
     padding: 0.8rem 1.5rem;
-    background-color: #ffd700;
-    color: #1a1a2e;
+    background-color: var(--accent-color);
+    color: var(--bg-primary);
     border-radius: 25px;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 600;
     transition: background-color 0.2s ease;
 }
 
@@ -356,8 +351,8 @@ a {
 }
 
 .modal-content {
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    border: 1px solid #ffd700;
+    background: linear-gradient(135deg, #2D3748, #1A202C);
+    border: 1px solid var(--accent-color);
     padding: 2rem;
     border-radius: 15px;
     width: 90%;
@@ -375,13 +370,13 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
     padding-bottom: 1rem;
     margin-bottom: 1rem;
 }
 
 .modal-header h2 {
-    background: linear-gradient(45deg, #ffd700, #ffeb3b);
+    background: linear-gradient(45deg, var(--accent-color), #ffeb3b);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -406,11 +401,11 @@ a {
 }
 
 .music-item:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .music-title-span {
-    color: #fff;
+    color: var(--text-primary);
     flex-grow: 1;
     text-align: left;
 }
@@ -421,14 +416,14 @@ a {
 }
 
 .action-btn {
-    background-color: #ffd700;
-    color: #1a1a2e;
+    background-color: var(--accent-color);
+    color: var(--bg-primary);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 20px;
     cursor: pointer;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 600;
     transition: background-color 0.2s ease;
 }
 
@@ -436,7 +431,6 @@ a {
     background-color: #ffeb3b;
 }
 
-/* --- NOVOS ESTILOS PARA A PAGINAÇÃO DO MODAL --- */
 .pagination-container {
     display: flex;
     justify-content: center;
@@ -448,7 +442,7 @@ a {
 
 .pagination-btn {
     background: transparent;
-    color: #b3b3b3;
+    color: var(--text-secondary);
     border: 1px solid #555;
     padding: 8px 12px;
     cursor: pointer;
@@ -457,87 +451,141 @@ a {
 }
 
 .pagination-btn:hover {
-    background: #ffd700;
-    color: #121212;
-    border-color: #ffd700;
+    background: var(--accent-color);
+    color: var(--bg-primary);
+    border-color: var(--accent-color);
 }
 
 .pagination-btn.active {
-    background: #ffd700;
-    color: #121212;
-    border-color: #ffd700;
+    background: var(--accent-color);
+    color: var(--bg-primary);
+    border-color: var(--accent-color);
     font-weight: bold;
 }
 
 /* ==========================================================================
-   REGRAS DE RESPONSIVIDADE (Media Queries)
+   FOOTER
    ========================================================================== */
+.main-footer {
+    background-color: var(--bg-secondary);
+    padding: 2rem 0;
+    margin-top: 4rem;
+    border-top: 1px solid #4A5568;
+}
 
-/* Para telas de tablets e celulares maiores (até 768px) */
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.footer-social {
+    display: flex;
+    gap: 1rem;
+}
+
+.footer-social img {
+    width: 24px;
+    height: 24px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.footer-social a:hover img {
+    opacity: 1;
+}
+
+.footer-copyright {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.footer-whatsapp a {
+    background-color: #25D366;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.footer-whatsapp a:hover {
+    background-color: #128C7E;
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE
+   ========================================================================== */
 @media (max-width: 768px) {
     .main-header {
-        padding: 1rem; /* Diminui o espaçamento do header */
+        padding: 1rem;
     }
 
     .hero-section h1 {
-        font-size: 2.5rem; /* Diminui o título principal */
+        font-size: 2.5rem;
     }
 
     .hero-section p {
-        font-size: 1rem; /* Diminui o parágrafo */
-    }
-
-    .shelf-slider-container {
-        padding: 0 1rem; /* Menos espaço nas laterais do slider */
-    }
-
-    .shelf-title {
-        font-size: 1.5rem; /* Diminui o título das seções */
+        font-size: 1rem;
     }
 
     .main-container {
-        padding: 0 1rem; /* Menos espaço nas laterais do conteúdo principal */
+        padding: 0 1rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .shelf-slider-container {
+        padding: 0;
+    }
+
+    .shelf-arrow {
+        display: none;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        gap: 1.5rem;
     }
 }
 
-/* Para telas de celulares pequenos (até 480px), como o seu de 375px */
 @media (max-width: 480px) {
     .logo {
-        font-size: 1.5rem; /* Diminui o logo */
+        font-size: 1.5rem;
     }
 
     .hero-section {
-        height: 40vh; /* Menor altura para a seção hero */
+        height: 40vh;
     }
 
     .hero-section h1 {
-        font-size: 2rem; /* Título ainda menor */
-    }
-
-    .swiper-container {
-        height: 30vh; /* Slider um pouco menor */
+        font-size: 2rem;
     }
 
     .shelf-grid {
-        /* Muda para 2 colunas de cards em vez de auto-fill */
         grid-template-columns: repeat(2, 1fr);
-        gap: 1rem; /* Menor espaço entre os cards */
+        gap: 1rem;
     }
 
     .card-artwork {
-        height: 120px; /* Imagem/ícone do card menor */
-        font-size: 2rem; /* Ícone do card menor */
+        height: 120px;
+        font-size: 2rem;
     }
 
     .card-info {
-        padding: 0.8rem; /* Menos espaçamento dentro do card */
+        padding: 0.8rem;
     }
 
     .card-title {
-        font-size: 0.9rem; /* Título do card menor */
+        font-size: 0.9rem;
     }
 
     .card-description {
-        font-size: 0.8rem; /* Descrição do card menor */
+        font-size: 0.8rem;
     }
 }

@@ -5,6 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advento - Biblioteca Musical Católica</title>
+
+    <!-- Novas Fontes do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
@@ -16,7 +23,7 @@
     <main class="main-content">
         <h2 class="page-title">Momentos da Missa</h2>
         <div class="moments-grid">
-            <div class="moment-item" onclick="openMusicList('Entrada')">
+            <div class="moment-item" onclick="openMusicList('Entrada' )">
                 <h3>Entrada</h3>
             </div>
             <div class="moment-item" onclick="openMusicList('Ato Penitencial')">
@@ -51,7 +58,6 @@
                 <button class="close-modal-btn" onclick="closeModal()">&times;</button>
             </div>
             <div id="modal-music-list" class="modal-body"></div>
-            <!-- NOVO: Container para os botões de paginação -->
             <div id="modal-pagination" class="pagination-container"></div>
         </div>
     </div>
@@ -87,15 +93,12 @@
                     songs.forEach(song => {
                         const item = document.createElement('div');
                         item.className = 'music-item';
-
                         const title = document.createElement('span');
                         title.className = 'music-title-span';
                         title.textContent = song.titulo;
                         item.appendChild(title);
-
                         const buttonsContainer = document.createElement('div');
                         buttonsContainer.className = 'action-buttons';
-
                         if (song.letraUrl) {
                             const letraLink = document.createElement('a');
                             letraLink.href = song.letraUrl;
@@ -104,7 +107,6 @@
                             letraLink.setAttribute('target', '_blank');
                             buttonsContainer.appendChild(letraLink);
                         }
-
                         if (song.cifraUrl) {
                             const cifraLink = document.createElement('a');
                             cifraLink.href = song.cifraUrl;
@@ -113,7 +115,6 @@
                             cifraLink.setAttribute('target', '_blank');
                             buttonsContainer.appendChild(cifraLink);
                         }
-
                         const downloadLink = document.createElement('a');
                         downloadLink.href = song.downloadUrl;
                         downloadLink.textContent = 'Baixar';
@@ -121,12 +122,10 @@
                         downloadLink.setAttribute('target', '_blank');
                         downloadLink.setAttribute('download', '');
                         buttonsContainer.appendChild(downloadLink);
-
                         item.appendChild(buttonsContainer);
                         musicListContainer.appendChild(item);
                     });
 
-                    // LÓGICA PARA CRIAR OS BOTÕES DE PAGINAÇÃO
                     if (data.totalPages > 1) {
                         for (let i = 1; i <= data.totalPages; i++) {
                             const pageBtn = document.createElement('button');
@@ -139,7 +138,6 @@
                             paginationContainer.appendChild(pageBtn);
                         }
                     }
-
                 } else {
                     musicListContainer.innerHTML = '<p>Nenhuma música encontrada para esta categoria.</p>';
                 }
