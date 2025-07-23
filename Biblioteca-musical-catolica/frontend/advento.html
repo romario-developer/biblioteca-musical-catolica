@@ -1,17 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advento - Biblioteca Musical Católica</title>
+    <title>Advento - HolyTracks</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-
 <body>
     <header class="main-header">
         <a href="index.html" class="logo">Holy<span>Tracks</span></a>
@@ -30,9 +27,9 @@
         </section>
 
         <div id="moments-container" class="moments-grid">
-            <!-- Cards dos momentos serão inseridos aqui -->
+            <p>Carregando momentos...</p>
         </div>
-
+        
         <a href="index.html" class="back-button" style="margin: 3rem auto 0; display: table;">← Voltar para o Início</a>
     </main>
 
@@ -48,31 +45,45 @@
     </div>
 
     <script>
+        const TEMPO_LITURGICO = 'Advento'; // Única variável a ser mudada por página
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const momentsContainer = document.getElementById('moments-container');
+            try {
+                const response = await fetch(`https://biblioteca-musical-catolica.onrender.com/api/momentos?tempo=${TEMPO_LITURGICO}` );
+                if (!response.ok) throw new Error('Falha ao carregar momentos.');
+                
+                const momentos = await response.json();
+                momentsContainer.innerHTML = '';
+
+                const ordemMomentosMissa = ['Entrada', 'Ato Penitencial', 'Glória', 'Salmo', 'Aclamação', 'Ofertório', 'Santo', 'Cordeiro', 'Comunhão', 'Final'];
+                momentos.sort((a, b) => {
+                    const indexA = ordemMomentosMissa.indexOf(a);
+                    const indexB = ordemMomentosMissa.indexOf(b);
+                    if (indexA === -1 && indexB === -1) return a.localeCompare(b); // Ordena alfabeticamente os não listados
+                    if (indexA === -1) return 1;
+                    if (indexB === -1) return -1;
+                    return indexA - indexB;
+                });
+
+                // Regra específica para Quaresma (exemplo)
+                const momentosFiltrados = TEMPO_LITURGICO === 'Quaresma' ? momentos.filter(m => m !== 'Glória') : momentos;
+
+                momentosFiltrados.forEach(momento => {
+                    const item = document.createElement('div');
+                    item.className = 'moment-item';
+                    item.setAttribute('onclick', `openMusicList('${momento}')`);
+                    item.innerHTML = `<h3>${momento}</h3>`;
+                    momentsContainer.appendChild(item);
+                });
+
+            } catch (error) {
+                momentsContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
+            }
+        });
+
         const modal = document.getElementById('music-list-modal');
         function closeModal() { modal.classList.remove('active'); }
-
-        // --- NOVA LÓGICA DE ORDENAÇÃO ---
-        const ordemMomentosMissa = ['Entrada', 'Ato Penitencial', 'Glória', 'Salmo', 'Aclamação', 'Ofertório', 'Santo', 'Cordeiro', 'Comunhão', 'Final'];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const momentsContainer = document.getElementById('moments-container');
-            let momentosParaExibir = [...ordemMomentosMissa];
-
-            // Regra específica: Omitir "Glória" na Quaresma
-            // (Para o Advento, o Glória é mantido, mas a lógica estaria aqui se fosse a página da Quaresma)
-            // if (tempoLiturgico === 'Quaresma') {
-            //     momentosParaExibir = momentosParaExibir.filter(m => m !== 'Glória');
-            // }
-
-            momentosParaExibir.forEach(momento => {
-                const item = document.createElement('div');
-                item.className = 'moment-item';
-                item.setAttribute('onclick', `openMusicList('${momento}')`);
-                item.innerHTML = `<h3>${momento}</h3>`;
-                momentsContainer.appendChild(item);
-            });
-        });
-        // --- FIM DA NOVA LÓGICA ---
 
         async function openMusicList(category, page = 1) {
             const modalTitle = document.getElementById('modal-category-title');
@@ -85,16 +96,12 @@
             modalTitle.textContent = category;
 
             try {
-                const tempoLiturgico = 'Advento'; // MUDE AQUI PARA CADA PÁGINA
                 const limit = 5;
-                const url = `https://biblioteca-musical-catolica.onrender.com/api/musicas?tempo=${encodeURIComponent(tempoLiturgico)}&momento=${encodeURIComponent(category)}&page=${page}&limit=${limit}`;
-
+                const url = `https://biblioteca-musical-catolica.onrender.com/api/musicas?tempo=${encodeURIComponent(TEMPO_LITURGICO )}&momento=${encodeURIComponent(category)}&page=${page}&limit=${limit}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
                 const data = await response.json();
                 const songs = data.musicas;
-
                 musicListContainer.innerHTML = '';
 
                 if (songs.length > 0) {
@@ -139,9 +146,7 @@
                             const pageBtn = document.createElement('button');
                             pageBtn.textContent = i;
                             pageBtn.className = 'pagination-btn';
-                            if (i === data.currentPage) {
-                                pageBtn.classList.add('active');
-                            }
+                            if (i === data.currentPage) pageBtn.classList.add('active');
                             pageBtn.onclick = () => openMusicList(category, i);
                             paginationContainer.appendChild(pageBtn);
                         }
@@ -156,5 +161,4 @@
         }
     </script>
 </body>
-
 </html>

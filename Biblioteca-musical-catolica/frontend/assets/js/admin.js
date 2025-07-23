@@ -1,4 +1,4 @@
-// --- LÓGICA COMPLETA PARA O PAINEL DE ADMIN ---
+// --- LÓGICA COMPLETA E CORRIGIDA PARA O PAINEL DE ADMIN ---
 
 // Verifica a autenticação no início de tudo
 if (sessionStorage.getItem('isAuthenticated') !== 'true') {
@@ -12,11 +12,7 @@ const momentosPorCategoria = {
     'Grupo de Oração': ['Animação', 'Louvor', 'Espírito Santo', 'Adoração', 'Perdão', 'Pós-pregação', 'Mariana'],
     'Casamento': ['Entrada do Noivo', 'Entrada da Noiva', 'Bênção das Alianças', 'Comunhão', 'Assinaturas', 'Saída']
 };
-
-// Lista de Tempos Litúrgicos (para não depender das chaves do objeto acima)
 const temposLiturgicos = ['Advento', 'Natal', 'Quaresma', 'Páscoa', 'Tempo Comum', 'Corpus Christi', 'Pentecostes'];
-
-// URL base da API
 const API_URL = 'https://biblioteca-musical-catolica.onrender.com';
 
 // --- FUNÇÕES DE UTILIDADE E MANIPULAÇÃO DO DOM ---
@@ -34,8 +30,16 @@ function formatarTexto(str) {
 function atualizarSugestoesDeMomento(categoria, datalistElementId) {
     const datalist = document.getElementById(datalistElementId);
     if (!datalist) return;
-    datalist.innerHTML = '';
-    const momentos = momentosPorCategoria[categoria] || [];
+
+    datalist.innerHTML = ''; // Limpa as opções antigas
+
+    let momentos = [];
+    if (temposLiturgicos.includes(categoria)) {
+        momentos = momentosPorCategoria['Missa']; // Se for um tempo litúrgico, usa os momentos da Missa
+    } else {
+        momentos = momentosPorCategoria[categoria] || []; // Senão, usa a lista específica (GO, Casamento)
+    }
+
     momentos.forEach(momento => {
         const option = document.createElement('option');
         option.value = momento;
@@ -57,7 +61,7 @@ function showTab(event, tabName) {
     }
 }
 
-// --- FUNÇÕES DE MÚSICA (LISTAR, DELETAR, EDITAR) ---
+// --- FUNÇÕES DE MÚSICA (CRUD) ---
 
 async function loadMusicList() {
     const tableBody = document.querySelector('#music-table tbody');
@@ -102,8 +106,8 @@ async function editMusic(id) {
         editForm.innerHTML = `<input type="hidden" id="edit-id" value="${musica._id}"><div class="form-group"><label for="edit-titulo">Título</label><input type="text" id="edit-titulo" value="${musica.titulo || ''}" required></div><div class="form-group"><label for="edit-artista">Artista</label><input type="text" id="edit-artista" value="${musica.artista || ''}"></div><div class="form-group"><label for="edit-tempo">Tempo/Categoria</label><select id="edit-tempo" required></select></div><div class="form-group"><label for="edit-momento">Momento</label><input type="text" id="edit-momento" list="edit-momentos-lista" value="${musica.momento || ''}" required><datalist id="edit-momentos-lista"></datalist></div><div class="form-group"><label for="edit-tom">Tom</label><input type="text" id="edit-tom" value="${musica.tom || ''}"></div><div class="form-group"><label for="edit-downloadUrl">Link de Download (Multitrack)</label><input type="url" id="edit-downloadUrl" value="${musica.downloadUrl || ''}" required></div><div class="form-group"><label for="edit-letraUrl">Link da Letra</label><input type="url" id="edit-letraUrl" value="${musica.letraUrl || ''}"></div><div class="form-group"><label for="edit-cifraUrl">Link da Cifra</label><input type="url" id="edit-cifraUrl" value="${musica.cifraUrl || ''}"></div><button type="submit">Salvar Alterações</button>`;
 
         const tempoSelect = document.getElementById('edit-tempo');
-        const todasCategorias = [...temposLiturgicos, ...Object.keys(momentosPorCategoria)];
-        const categoriasUnicas = [...new Set(todasCategorias)]; // Remove duplicatas
+        const todasCategorias = [...temposLiturgicos, ...Object.keys(momentosPorCategoria).filter(k => k !== 'Missa')];
+        const categoriasUnicas = [...new Set(todasCategorias)];
 
         categoriasUnicas.forEach(t => {
             const option = document.createElement('option');
@@ -209,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     messageDiv.style.marginTop = '1rem';
     addForm.after(messageDiv);
 
-    const todasCategorias = [...temposLiturgicos, ...Object.keys(momentosPorCategoria)];
+    const todasCategorias = [...temposLiturgicos, ...Object.keys(momentosPorCategoria).filter(k => k !== 'Missa')];
     const categoriasUnicas = [...new Set(todasCategorias)];
 
     categoriasUnicas.forEach(t => {
