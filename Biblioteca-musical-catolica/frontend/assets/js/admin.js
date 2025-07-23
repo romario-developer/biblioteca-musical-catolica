@@ -17,7 +17,7 @@ const API_URL = 'https://biblioteca-musical-catolica.onrender.com';
 
 // --- FUNÇÕES DE UTILIDADE E MANIPULAÇÃO DO DOM ---
 
-function logout() {
+function logout( ) {
     sessionStorage.removeItem('isAuthenticated');
     window.location.href = 'login.html';
 }
@@ -29,15 +29,17 @@ function formatarTexto(str) {
 
 function atualizarSugestoesDeMomento(categoria, datalistElementId) {
     const datalist = document.getElementById(datalistElementId);
-    if (!datalist) return;
-
-    datalist.innerHTML = ''; // Limpa as opções antigas
-
+    const inputMomento = document.querySelector(`input[list="${datalistElementId}"]`);
+    if (!datalist || !inputMomento) return;
+    
+    datalist.innerHTML = '';
+    inputMomento.value = ''; // Limpa o campo de texto
+    
     let momentos = [];
     if (temposLiturgicos.includes(categoria)) {
-        momentos = momentosPorCategoria['Missa']; // Se for um tempo litúrgico, usa os momentos da Missa
+        momentos = momentosPorCategoria['Missa'];
     } else {
-        momentos = momentosPorCategoria[categoria] || []; // Senão, usa a lista específica (GO, Casamento)
+        momentos = momentosPorCategoria[categoria] || [];
     }
 
     momentos.forEach(momento => {
@@ -45,6 +47,9 @@ function atualizarSugestoesDeMomento(categoria, datalistElementId) {
         option.value = momento;
         datalist.appendChild(option);
     });
+
+    // Atualiza o placeholder para guiar o usuário
+    inputMomento.placeholder = momentos.length > 0 ? 'Selecione ou digite um momento' : 'Digite um momento';
 }
 
 function showTab(event, tabName) {
@@ -223,8 +228,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tempoSelectAdd.appendChild(option);
     });
 
+    // <<<--- CORREÇÃO APLICADA AQUI ---<<<
     tempoSelectAdd.addEventListener('change', () => {
-        document.getElementById('add-momento').placeholder = 'Ex: Entrada, Comunhão, Animação...';
         atualizarSugestoesDeMomento(tempoSelectAdd.value, 'add-momentos-lista');
     });
 
