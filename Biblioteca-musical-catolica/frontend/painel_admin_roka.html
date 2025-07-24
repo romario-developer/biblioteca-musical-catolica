@@ -36,7 +36,7 @@
                         <option value="" disabled selected>Selecione uma categoria</option>
                     </select></div>
 
-                <!-- CORREÇÃO: Campo "Momento" agora é um <select> -->
+                <!-- CORREÇÃO: Campo "Momento" agora é um <select> para funcionar com o JS -->
                 <div class="form-group"><label for="add-momento">Momento</label><select id="add-momento" required>
                         <option value="" disabled selected>Selecione uma categoria primeiro</option>
                     </select></div>
@@ -52,7 +52,7 @@
             </form>
         </div>
 
-        <!-- Aba de Gerenciar Músicas -->
+        <!-- Outras abas e modal continuam aqui -->
         <div id="manage" class="tab-content">
             <h2>Músicas Cadastradas</h2>
             <table id="music-table">
@@ -67,8 +67,6 @@
                 <tbody></tbody>
             </table>
         </div>
-
-        <!-- Aba de Gerenciar Slider -->
         <div id="slider" class="tab-content">
             <h2>Gerenciar Slides de Destaque</h2>
             <form id="slider-form">
@@ -78,8 +76,6 @@
             </form>
         </div>
     </div>
-
-    <!-- Modal de Edição -->
     <div id="edit-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeEditModal()">&times;</span>

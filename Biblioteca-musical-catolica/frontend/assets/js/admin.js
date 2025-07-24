@@ -1,12 +1,10 @@
 // --- LÓGICA COMPLETA E FINAL PARA O PAINEL DE ADMIN ---
 
-// Verifica a autenticação no início de tudo
 if (sessionStorage.getItem('isAuthenticated') !== 'true') {
     alert('Acesso negado. Por favor, faça o login.');
     window.location.href = 'login.html';
 }
 
-// Mapeamento de momentos por categoria
 const momentosPorCategoria = {
     'Missa': ['Entrada', 'Ato Penitencial', 'Glória', 'Salmo', 'Aclamação', 'Ofertório', 'Santo', 'Cordeiro', 'Comunhão', 'Final'],
     'Grupo de Oração': ['Animação', 'Louvor', 'Espírito Santo', 'Adoração', 'Perdão', 'Pós-pregação', 'Mariana'],
@@ -15,41 +13,25 @@ const momentosPorCategoria = {
 const temposLiturgicos = ['Advento', 'Natal', 'Quaresma', 'Páscoa', 'Tempo Comum', 'Corpus Christi', 'Pentecostes'];
 const API_URL = 'https://biblioteca-musical-catolica.onrender.com';
 
-// --- FUNÇÕES DE UTILIDADE E MANIPULAÇÃO DO DOM ---
+function logout() { sessionStorage.removeItem('isAuthenticated'); window.location.href = 'login.html'; }
+function formatarTexto(str) { if (!str) return ''; return str.trim().split(' ').map(palavra => palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase()).join(' '); }
 
-function logout( ) {
-    sessionStorage.removeItem('isAuthenticated');
-    window.location.href = 'login.html';
-}
-
-function formatarTexto(str) {
-    if (!str) return '';
-    return str.trim().split(' ').map(palavra => palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase()).join(' ');
-}
-
-// CORREÇÃO: Função reescrita para popular um <select>
 function popularSelectDeMomentos(categoria, selectElementId) {
     const selectMomento = document.getElementById(selectElementId);
     if (!selectMomento) return;
-
-    selectMomento.innerHTML = ''; // Limpa as opções antigas
-    
+    selectMomento.innerHTML = '';
     let momentos = [];
     if (temposLiturgicos.includes(categoria)) {
         momentos = momentosPorCategoria['Missa'];
     } else {
         momentos = momentosPorCategoria[categoria] || [];
     }
-
-    // Adiciona a opção padrão
     const defaultOption = document.createElement('option');
     defaultOption.value = "";
     defaultOption.textContent = "Selecione um momento";
     defaultOption.disabled = true;
     defaultOption.selected = true;
     selectMomento.appendChild(defaultOption);
-
-    // Adiciona as opções da lista
     momentos.forEach(momento => {
         const option = document.createElement('option');
         option.value = momento;
@@ -63,19 +45,15 @@ function showTab(event, tabName) {
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     document.getElementById(tabName).classList.add('active');
     event.currentTarget.classList.add('active');
-
     if (tabName === 'manage') loadMusicList();
     else if (tabName === 'slider') criarInputsSlider();
 }
-
-// --- FUNÇÕES DE MÚSICA (CRUD) ---
 
 async function loadMusicList() {
     const tableBody = document.querySelector('#music-table tbody');
     tableBody.innerHTML = '<tr><td colspan="4">Carregando...</td></tr>';
     try {
         const response = await fetch(`${API_URL}/api/musicas/all`);
-        if (!response.ok) throw new Error('Falha ao carregar a lista.');
         const musicas = await response.json();
         tableBody.innerHTML = '';
         musicas.forEach(musica => {
@@ -100,23 +78,16 @@ async function deleteMusic(id) {
 
 const editModal = document.getElementById('edit-modal');
 const editForm = document.getElementById('edit-music-form');
-
-function closeEditModal() {
-    editModal.style.display = 'none';
-}
+function closeEditModal() { editModal.style.display = 'none'; }
 
 async function editMusic(id) {
     try {
         const response = await fetch(`${API_URL}/api/musicas/${id}`);
-        if (!response.ok) throw new Error('Não foi possível carregar os dados da música.');
         const musica = await response.json();
-        
         editForm.innerHTML = `<input type="hidden" id="edit-id" value="${musica._id}"><div class="form-group"><label for="edit-titulo">Título</label><input type="text" id="edit-titulo" value="${musica.titulo || ''}" required></div><div class="form-group"><label for="edit-artista">Artista</label><input type="text" id="edit-artista" value="${musica.artista || ''}"></div><div class="form-group"><label for="edit-tempo">Tempo/Categoria</label><select id="edit-tempo" required></select></div><div class="form-group"><label for="edit-momento">Momento</label><select id="edit-momento" required></select></div><div class="form-group"><label for="edit-tom">Tom</label><input type="text" id="edit-tom" value="${musica.tom || ''}"></div><div class="form-group"><label for="edit-downloadUrl">Link de Download (Multitrack)</label><input type="url" id="edit-downloadUrl" value="${musica.downloadUrl || ''}" required></div><div class="form-group"><label for="edit-letraUrl">Link da Letra</label><input type="url" id="edit-letraUrl" value="${musica.letraUrl || ''}"></div><div class="form-group"><label for="edit-cifraUrl">Link da Cifra</label><input type="url" id="edit-cifraUrl" value="${musica.cifraUrl || ''}"></div><button type="submit">Salvar Alterações</button>`;
-
         const tempoSelect = document.getElementById('edit-tempo');
         const todasCategorias = [...temposLiturgicos, ...Object.keys(momentosPorCategoria).filter(k => k !== 'Missa')];
         const categoriasUnicas = [...new Set(todasCategorias)];
-
         categoriasUnicas.forEach(t => {
             const option = document.createElement('option');
             option.value = t;
@@ -124,12 +95,9 @@ async function editMusic(id) {
             if (t === musica.tempo) option.selected = true;
             tempoSelect.appendChild(option);
         });
-
         popularSelectDeMomentos(tempoSelect.value, 'edit-momento');
-        document.getElementById('edit-momento').value = musica.momento; // Seleciona o momento atual
-        
+        document.getElementById('edit-momento').value = musica.momento;
         tempoSelect.addEventListener('change', () => popularSelectDeMomentos(tempoSelect.value, 'edit-momento'));
-
         editModal.style.display = 'block';
     } catch (error) {
         alert(error.message);
@@ -160,11 +128,9 @@ editForm.addEventListener('submit', async (event) => {
     }
 });
 
-// --- FUNÇÕES DO SLIDER ---
-
 function criarInputsSlider() {
     const container = document.getElementById('slider-inputs');
-    if (container.innerHTML !== '') return; // Evita recriar os inputs
+    if (container.innerHTML !== '') return;
     for (let i = 1; i <= 6; i++) {
         const div = document.createElement('div');
         div.className = 'form-group slider-group';
@@ -208,30 +174,23 @@ document.getElementById('slider-form').addEventListener('submit', async (event) 
     }
 });
 
-// --- INICIALIZAÇÃO QUANDO A PÁGINA CARREGA ---
-
 document.addEventListener('DOMContentLoaded', () => {
     const addForm = document.getElementById('add-music-form');
     const tempoSelectAdd = document.getElementById('add-tempo');
     const messageDiv = document.createElement('div');
     messageDiv.style.marginTop = '1rem';
     addForm.after(messageDiv);
-
     const todasCategorias = [...temposLiturgicos, ...Object.keys(momentosPorCategoria).filter(k => k !== 'Missa')];
     const categoriasUnicas = [...new Set(todasCategorias)];
-
     categoriasUnicas.forEach(t => {
         const option = document.createElement('option');
         option.value = t;
         option.textContent = t;
         tempoSelectAdd.appendChild(option);
     });
-
-    // CORREÇÃO FINAL: Adiciona o "ouvinte" ao select de categoria
     tempoSelectAdd.addEventListener('change', () => {
         popularSelectDeMomentos(tempoSelectAdd.value, 'add-momento');
     });
-
     addForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         messageDiv.style.display = 'none';
@@ -260,4 +219,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
