@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biblioteca - HolyTracks</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
+
 <body>
     <header class="main-header">
         <a href="index.html" class="logo">Holy<span>Tracks</span></a>
@@ -33,7 +36,8 @@
             <div id="library-grid" class="shelf-grid">
                 <!-- Os cards das músicas serão inseridos aqui pelo JavaScript -->
             </div>
-            <p id="no-results-message" style="display: none; text-align: center; margin-top: 2rem;">Nenhuma música encontrada.</p>
+            <p id="no-results-message" style="display: none; text-align: center; margin-top: 2rem;">Nenhuma música
+                encontrada.</p>
         </section>
     </main>
 
@@ -41,9 +45,12 @@
         <!-- O mesmo footer do index.html -->
         <div class="main-container footer-content">
             <div class="footer-social">
-                <a href="https://instagram.com/seu_usuario" target="_blank" title="Instagram"><img src="https://img.icons8.com/ios-filled/50/A0AEC0/instagram-new.png" alt="Instagram"/></a>
-                <a href="https://youtube.com/seu_canal" target="_blank" title="YouTube"><img src="https://img.icons8.com/ios-filled/50/A0AEC0/youtube-play.png" alt="YouTube"/></a>
-                <a href="mailto:suporte@holytracks.com" title="Suporte por E-mail"><img src="https://img.icons8.com/ios-filled/50/A0AEC0/mail.png" alt="Suporte"/></a>
+                <a href="https://instagram.com/seu_usuario" target="_blank" title="Instagram"><img
+                        src="https://img.icons8.com/ios-filled/50/A0AEC0/instagram-new.png" alt="Instagram" /></a>
+                <a href="https://youtube.com/seu_canal" target="_blank" title="YouTube"><img
+                        src="https://img.icons8.com/ios-filled/50/A0AEC0/youtube-play.png" alt="YouTube" /></a>
+                <a href="mailto:suporte@holytracks.com" title="Suporte por E-mail"><img
+                        src="https://img.icons8.com/ios-filled/50/A0AEC0/mail.png" alt="Suporte" /></a>
             </div>
             <div class="footer-copyright">
                 <p>&copy; 2025 HolyTracks. Todos os direitos reservados.</p>
@@ -54,42 +61,61 @@
         </div>
     </footer>
 
+    <!-- Painel Lateral de Detalhes da Música -->
+    <div id="music-detail-panel" class="music-detail-panel">
+        <button class="close-panel-btn">&times;</button>
+        <div class="panel-content">
+            <div class="panel-artwork" id="detail-artwork"></div>
+            <h2 id="detail-title"></h2>
+            <p id="detail-artist"></p>
+            <p id="detail-tempo-momento"></p>
+            <p id="detail-tom"></p>
+            <div class="panel-actions">
+                <a id="btn-letra" href="#" target="_blank" class="action-btn">Letra</a>
+                <a id="btn-cifra" href="#" target="_blank" class="action-btn">Cifra</a>
+                <a id="btn-download" href="#" target="_blank" class="action-btn primary-btn">Baixar Multitrack</a>
+            </div>
+        </div>
+    </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', ( ) => {
-            const searchInput = document.getElementById('search-input');
-            const libraryGrid = document.getElementById('library-grid');
-            const noResultsMessage = document.getElementById('no-results-message');
+        document.addEventListener("DOMContentLoaded", () => {
+            const searchInput = document.getElementById("search-input");
+            const libraryGrid = document.getElementById("library-grid");
+            const noResultsMessage = document.getElementById("no-results-message");
+            const musicDetailPanel = document.getElementById("music-detail-panel");
+            const closePanelBtn = document.querySelector(".close-panel-btn");
             let todasAsMusicas = []; // Array para guardar todas as músicas carregadas
 
             // Função para renderizar os cards na tela
             function renderizarMusicas(musicas) {
-                libraryGrid.innerHTML = ''; // Limpa a grade
+                libraryGrid.innerHTML = ""; // Limpa a grade
                 if (musicas.length === 0) {
-                    noResultsMessage.style.display = 'block';
+                    noResultsMessage.style.display = "block";
                 } else {
-                    noResultsMessage.style.display = 'none';
+                    noResultsMessage.style.display = "none";
                 }
 
                 musicas.forEach(musica => {
-                    // Usaremos o mesmo estilo dos cards da página inicial
-                    const card = document.createElement('a');
-                    card.className = 'category-card'; // Reutilizando a classe
-                    // Futuramente, o link pode levar para uma página de detalhes da música
-                    card.href = '#'; 
+                    const card = document.createElement("div"); // Alterado para div para evitar navegação
+                    card.className = "category-card";
+                    card.dataset.id = musica._id; // Armazena o ID da música no dataset
 
-                    // Tenta usar a imagem da música, se não houver, usa um ícone padrão
-                    const artworkContent = musica.imageUrl 
-                        ? `<div class="card-artwork" style="background-image: url('${musica.imageUrl}')"></div>`
+                    const artworkContent = musica.imageUrl
+                        ? `<div class="card-artwork" style="background-image: url(\'${musica.imageUrl}\')"></div>`
                         : `<div class="card-artwork">🎵</div>`;
 
                     card.innerHTML = `
                         ${artworkContent}
                         <div class="card-info">
                             <div class="card-title">${musica.titulo}</div>
-                            <div class="card-description">${musica.artista || 'Artista não informado'}</div>
+                            <div class="card-description">${musica.artista || "Artista não informado"}</div>
                         </div>
                     `;
                     libraryGrid.appendChild(card);
+
+                    // Adiciona o evento de clique para abrir o painel de detalhes
+                    card.addEventListener("click", () => openMusicDetailPanel(musica));
                 });
             }
 
@@ -97,8 +123,8 @@
             function filtrarMusicas() {
                 const termo = searchInput.value.toLowerCase();
                 const musicasFiltradas = todasAsMusicas.filter(musica => {
-                    const titulo = musica.titulo ? musica.titulo.toLowerCase() : '';
-                    const artista = musica.artista ? musica.artista.toLowerCase() : '';
+                    const titulo = musica.titulo ? musica.titulo.toLowerCase() : "";
+                    const artista = musica.artista ? musica.artista.toLowerCase() : "";
                     return titulo.includes(termo) || artista.includes(termo);
                 });
                 renderizarMusicas(musicasFiltradas);
@@ -107,23 +133,53 @@
             // Carrega todas as músicas da API
             async function carregarTodaBiblioteca() {
                 try {
-                    libraryGrid.innerHTML = '<p>Carregando biblioteca...</p>';
-                    const response = await fetch('https://biblioteca-musical-catolica.onrender.com/api/musicas/all' );
-                    if (!response.ok) throw new Error('Falha ao carregar a biblioteca.');
-                    
+                    libraryGrid.innerHTML = "<p>Carregando biblioteca...</p>";
+                    const response = await fetch("https://biblioteca-musical-catolica.onrender.com/api/musicas/all");
+                    if (!response.ok) throw new Error("Falha ao carregar a biblioteca.");
+
                     todasAsMusicas = await response.json();
                     renderizarMusicas(todasAsMusicas);
 
                     // Adiciona o "ouvinte" do evento de digitação APÓS carregar os dados
-                    searchInput.addEventListener('input', filtrarMusicas);
+                    searchInput.addEventListener("input", filtrarMusicas);
 
                 } catch (error) {
                     libraryGrid.innerHTML = `<p style="color: red;">${error.message}</p>`;
                 }
             }
 
+            // Função para abrir e popular o painel de detalhes da música
+            function openMusicDetailPanel(musica) {
+                document.getElementById("detail-artwork").style.backgroundImage = musica.imageUrl ? `url(\'${musica.imageUrl}\')` : "none";
+                document.getElementById("detail-artwork").textContent = musica.imageUrl ? "" : "🎵";
+                document.getElementById("detail-title").textContent = musica.titulo;
+                document.getElementById("detail-artist").textContent = musica.artista || "Artista não informado";
+                document.getElementById("detail-tempo-momento").textContent = `${musica.tempo} - ${musica.momento}`;
+                document.getElementById("detail-tom").textContent = `Tom: ${musica.tom || "Não informado"}`;
+
+                document.getElementById("btn-letra").href = musica.letraUrl || "#";
+                document.getElementById("btn-letra").style.display = musica.letraUrl ? "block" : "none";
+
+                document.getElementById("btn-cifra").href = musica.cifraUrl || "#";
+                document.getElementById("btn-cifra").style.display = musica.cifraUrl ? "block" : "none";
+
+                document.getElementById("btn-download").href = musica.downloadUrl || "#";
+                document.getElementById("btn-download").style.display = musica.downloadUrl ? "block" : "none";
+
+                musicDetailPanel.classList.add("active");
+            }
+
+            // Função para fechar o painel de detalhes da música
+            function closeMusicDetailPanel() {
+                musicDetailPanel.classList.remove("active");
+            }
+
+            // Event listener para o botão de fechar o painel
+            closePanelBtn.addEventListener("click", closeMusicDetailPanel);
+
             carregarTodaBiblioteca();
         });
     </script>
 </body>
+
 </html>
