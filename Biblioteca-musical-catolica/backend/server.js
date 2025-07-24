@@ -13,123 +13,139 @@ const PORT = process.env.PORT || 3000;
 // 3. Conexão com o Banco de Dados MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Conectado com sucesso ao MongoDB!'))
-  .catch((err) => {
-    console.error('--- ERRO CRÍTICO DE CONEXÃO COM O MONGODB ---');
-    console.error(err);
-    console.error('---------------------------------------------');
-  });
+  .catch((err) => console.error('--- ERRO CRÍTICO DE CONEXÃO COM O MONGODB ---', err));
 
 // 4. Definição dos Schemas e Modelos
 const musicaSchema = new mongoose.Schema({
-  titulo: String, artista: String, tempo: String, momento: String, tom: String,
-  downloadUrl: String, letraUrl: String, cifraUrl: String, imageUrl: String, previewUrl: String
+  titulo: String,
+  artista: String,
+  tempo: String,
+  momento: String,
+  tom: String,
+  downloadUrl: String,
+  letraUrl: String,
+  cifraUrl: String,
+  imageUrl: String,
+  previewUrl: String
 });
 const Musica = mongoose.model('Musica', musicaSchema, 'musicas');
 
 const destaqueSchema = new mongoose.Schema({
-  slides: [{ imageUrl: String, linkUrl: String }]
+  slides: [{
+    imageUrl: String,
+    linkUrl: String
+  }]
 });
 const Destaque = mongoose.model('Destaque', destaqueSchema);
 
-// --- ROTAS DE MÚSICAS ---
+// --- ROTAS ---
 
-// Rota GET para BUSCAR músicas para o site principal (com paginação)
-app.get('/api/musicas', async (req, res) => {
-  const { tempo, momento, page = 1, limit = 5 } = req.query;
-  if (!tempo || !momento) {
-    return res.status(400).json({ message: 'Parâmetros "tempo" e "momento" são obrigatórios.' });
-  }
-  try {
-    const query = {
-      tempo: new RegExp('^' + tempo + '$', 'i'),
-      momento: new RegExp('^' + momento + '$', 'i')
-    };
-    const musicas = await Musica.find(query).limit(limit * 1).skip((page - 1) * limit);
-    const count = await Musica.countDocuments(query);
-    res.json({ musicas, totalPages: Math.ceil(count / limit), currentPage: page });
-  } catch (error) {
-    res.status(500).json({ message: 'Erro interno do servidor.' });
-  }
-});
-
-// Rota GET para buscar TODAS as músicas para o painel de admin
+// Rota para buscar todas as músicas (usada no painel de admin)
 app.get('/api/musicas/all', async (req, res) => {
   try {
-    const todasAsMusicas = await Musica.find({}).sort({ tempo: 1, momento: 1, titulo: 1 });
-    res.json(todasAsMusicas);
+    const musicas = await Musica.find().sort({ titulo: 1 });
+    res.json(musicas);
   } catch (error) {
     res.status(500).json({ message: 'Erro ao buscar todas as músicas.' });
   }
 });
 
-// Rota GET para buscar UMA música por ID
+// Rota para buscar músicas por categoria e momento (usada na biblioteca)
+app.get('/api/musicas', async (req, res) => {
+  const { tempo, momento } = req.query;
+  try {
+    const query = {};
+    if (tempo) query.tempo = tempo;
+    if (momento) query.momento = momento;
+    const musicas = await Musica.find(query);
+    res.json(musicas);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao buscar músicas.' });
+  }
+});
+
+// Rota para buscar uma música específica por ID (usada para edição)
 app.get('/api/musicas/:id', async (req, res) => {
   try {
     const musica = await Musica.findById(req.params.id);
     if (!musica) return res.status(404).json({ message: 'Música não encontrada.' });
     res.json(musica);
   } catch (error) {
-    res.status(500).json({ message: 'Erro ao buscar música.' });
+    res.status(500).json({ message: 'Erro ao buscar a música.' });
   }
 });
 
-// Rota POST para SALVAR MÚSICAS
+// Rota para criar uma nova música
 app.post('/api/musicas', async (req, res) => {
   try {
     const novaMusica = new Musica(req.body);
     await novaMusica.save();
-    res.status(201).json({ message: 'Música salva com sucesso!', data: novaMusica });
+    res.status(201).json(novaMusica);
   } catch (error) {
-    res.status(500).json({ message: 'Erro ao salvar no banco de dados.' });
+    res.status(400).json({ message: 'Erro ao salvar a música.', error });
   }
 });
 
-// ROTA PUT para ATUALIZAR uma música por ID
+// Rota para atualizar uma música
 app.put('/api/musicas/:id', async (req, res) => {
   try {
     const musicaAtualizada = await Musica.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!musicaAtualizada) return res.status(404).json({ message: 'Música não encontrada para atualizar.' });
-    res.json({ message: 'Música atualizada com sucesso!', data: musicaAtualizada });
+    res.json(musicaAtualizada);
   } catch (error) {
-    res.status(500).json({ message: 'Erro ao atualizar no banco de dados.' });
+    res.status(400).json({ message: 'Erro ao atualizar a música.', error });
   }
 });
 
-// ROTA DELETE para excluir uma música
+// Rota para deletar uma música
 app.delete('/api/musicas/:id', async (req, res) => {
   try {
-    const resultado = await Musica.findByIdAndDelete(req.params.id);
-    if (!resultado) return res.status(404).json({ message: 'Música não encontrada.' });
-    res.json({ message: 'Música excluída com sucesso.' });
+    const musicaDeletada = await Musica.findByIdAndDelete(req.params.id);
+    if (!musicaDeletada) return res.status(404).json({ message: 'Música não encontrada para deletar.' });
+    res.json({ message: 'Música deletada com sucesso.' });
   } catch (error) {
-    res.status(500).json({ message: 'Erro ao excluir música.' });
+    res.status(500).json({ message: 'Erro ao deletar a música.' });
   }
 });
 
-// --- NOVA ROTA PARA MOMENTOS ---
-app.get('/api/momentos', async (req, res) => {
+// ==================================================================
+// == ROTA FALTANTE PARA O REPERTÓRIO ALEATÓRIO ==
+// ==================================================================
+app.get('/api/repertorio-aleatorio', async (req, res) => {
   const { tempo } = req.query;
+  const ordemMomentosMissa = ['Entrada', 'Ato Penitencial', 'Glória', 'Salmo', 'Aclamação', 'Ofertório', 'Santo', 'Cordeiro', 'Comunhão', 'Final'];
+
   if (!tempo) {
-    return res.status(400).json({ message: 'Parâmetro "tempo" é obrigatório.' });
+    return res.status(400).json({ message: 'O parâmetro "tempo" é obrigatório.' });
   }
+
   try {
-    const momentos = await Musica.distinct('momento', {
-      tempo: new RegExp('^' + tempo + '$', 'i')
-    });
-    res.json(momentos);
+    const repertorio = {};
+    for (const momento of ordemMomentosMissa) {
+      // Conta quantos documentos existem para a combinação tempo/momento
+      const count = await Musica.countDocuments({ tempo: tempo, momento: momento });
+      if (count > 0) {
+        // Se houver músicas, busca uma aleatória
+        const random = Math.floor(Math.random() * count);
+        const musicaAleatoria = await Musica.findOne({ tempo: tempo, momento: momento }).skip(random);
+        repertorio[momento] = musicaAleatoria;
+      } else {
+        // Se não houver, define como null
+        repertorio[momento] = null;
+      }
+    }
+    res.json(repertorio);
   } catch (error) {
-    res.status(500).json({ message: 'Erro ao buscar momentos.' });
+    console.error(`Erro ao gerar repertório para ${tempo}:`, error);
+    res.status(500).json({ message: 'Erro interno ao gerar repertório.' });
   }
 });
 
-// --- ROTAS DO SLIDER ---
+// Rota para Destaques (Slider)
 app.get('/api/destaques', async (req, res) => {
   try {
-    let destaques = await Destaque.findOne({});
-    if (!destaques) {
-      destaques = await new Destaque({ slides: [] }).save();
-    }
-    res.json(destaques.slides);
+    const destaque = await Destaque.findOne();
+    res.json(destaque ? destaque.slides : []);
   } catch (error) {
     res.status(500).json({ message: 'Erro ao buscar destaques.' });
   }
@@ -137,24 +153,24 @@ app.get('/api/destaques', async (req, res) => {
 
 app.post('/api/destaques', async (req, res) => {
   try {
-    const { slides } = req.body;
-    if (!Array.isArray(slides)) {
-      return res.status(400).json({ message: 'O corpo da requisição deve conter um array de slides.' });
+    await Destaque.deleteMany({}); // Apaga os slides antigos
+    if (req.body.slides && req.body.slides.length > 0) {
+      const novoDestaque = new Destaque({ slides: req.body.slides });
+      await novoDestaque.save();
     }
-    await Destaque.findOneAndUpdate({}, { slides: slides }, { upsert: true });
-    res.status(200).json({ message: 'Destaques atualizados com sucesso!' });
+    res.status(200).json({ message: 'Destaques atualizados.' });
   } catch (error) {
-    res.status(500).json({ message: 'Erro ao atualizar destaques.' });
+    res.status(400).json({ message: 'Erro ao salvar destaques.', error });
   }
 });
 
-// --- ROTA DE LOGIN ---
+// Rota de Login
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
-  if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASSWORD) {
-    res.status(200).json({ message: 'Login bem-sucedido!' });
+  if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
+    res.json({ success: true });
   } else {
-    res.status(401).json({ message: 'Usuário ou senha inválidos.' });
+    res.status(401).json({ success: false, message: 'Credenciais inválidas' });
   }
 });
 
