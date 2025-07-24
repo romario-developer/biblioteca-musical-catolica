@@ -78,6 +78,9 @@
         </div>
     </div>
 
+    <!-- Overlay para fechar o painel ao clicar fora -->
+    <div id="panel-overlay" class="overlay-active"></div>
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const searchInput = document.getElementById("search-input");
@@ -85,6 +88,7 @@
             const noResultsMessage = document.getElementById("no-results-message");
             const musicDetailPanel = document.getElementById("music-detail-panel");
             const closePanelBtn = document.querySelector(".close-panel-btn");
+            const panelOverlay = document.getElementById("panel-overlay"); // Novo elemento overlay
             let todasAsMusicas = []; // Array para guardar todas as músicas carregadas
 
             // Função para renderizar os cards na tela
@@ -167,15 +171,25 @@
                 document.getElementById("btn-download").style.display = musica.downloadUrl ? "block" : "none";
 
                 musicDetailPanel.classList.add("active");
+                panelOverlay.classList.add("active"); // Ativa o overlay
             }
 
             // Função para fechar o painel de detalhes da música
             function closeMusicDetailPanel() {
                 musicDetailPanel.classList.remove("active");
+                panelOverlay.classList.remove("active"); // Desativa o overlay
             }
 
             // Event listener para o botão de fechar o painel
             closePanelBtn.addEventListener("click", closeMusicDetailPanel);
+
+            // Event listener para fechar o painel ao clicar no overlay
+            panelOverlay.addEventListener("click", closeMusicDetailPanel);
+
+            // Previne que o clique dentro do painel feche-o (event bubbling)
+            musicDetailPanel.addEventListener("click", (event) => {
+                event.stopPropagation();
+            });
 
             carregarTodaBiblioteca();
         });
