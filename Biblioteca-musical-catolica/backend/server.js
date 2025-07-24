@@ -167,7 +167,7 @@ app.post('/api/destaques', async (req, res) => {
 // Rota de Login
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
-  if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
+  if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASSWORD) {
     res.json({ success: true });
   } else {
     res.status(401).json({ success: false, message: 'Credenciais inválidas' });

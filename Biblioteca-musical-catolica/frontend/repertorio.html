@@ -54,22 +54,22 @@
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const container = document.getElementById('repertorio-container');
-            const temposLiturgicos = ['Advento', 'Natal', 'Quaresma', 'Páscoa', 'Tempo Comum'];
+        document.addEventListener("DOMContentLoaded", async () => {
+            const container = document.getElementById("repertorio-container");
+            const temposLiturgicos = ["Advento", "Natal", "Quaresma", "Páscoa", "Tempo Comum"];
 
-            container.innerHTML = ''; // Limpa a mensagem de "carregando"
+            container.innerHTML = ""; // Limpa a mensagem de "carregando"
 
             for (const tempo of temposLiturgicos) {
-                const item = document.createElement('div');
-                item.className = 'accordion-item';
+                const item = document.createElement("div");
+                item.className = "accordion-item";
                 item.innerHTML = `
                     <button class="accordion-header">
                         <span>Repertório para ${tempo}</span>
                         <span class="accordion-icon">+</span>
                     </button>
                     <div class="accordion-content">
-                        <div class="repertorio-list" id="list-${tempo.replace(/\s+/g, '')}">
+                        <div class="repertorio-list" id="list-${tempo.replace(/\s+/g, "")}">
                             <p>Clique para gerar uma sugestão.</p>
                         </div>
                         <button class="suggest-again-btn" data-tempo="${tempo}">Sugerir Novamente</button>
@@ -78,48 +78,48 @@
                 container.appendChild(item);
             }
 
-            document.querySelectorAll('.accordion-header').forEach(header => {
-                header.addEventListener('click', () => {
+            document.querySelectorAll(".accordion-header").forEach(header => {
+                header.addEventListener("click", () => {
                     const item = header.parentElement;
-                    item.classList.toggle('active');
-                    const icon = header.querySelector('.accordion-icon');
-                    icon.textContent = item.classList.contains('active') ? '-' : '+';
+                    item.classList.toggle("active");
+                    const icon = header.querySelector(".accordion-icon");
+                    icon.textContent = item.classList.contains("active") ? "-" : "+";
                     // Gera o repertório na primeira vez que abre
-                    if (item.classList.contains('active') && item.querySelector('.repertorio-list p')) {
-                        const tempo = item.querySelector('.suggest-again-btn').dataset.tempo;
+                    if (item.classList.contains("active") && item.querySelector(".repertorio-list p")) {
+                        const tempo = item.querySelector(".suggest-again-btn").dataset.tempo;
                         gerarRepertorio(tempo);
                     }
                 });
             });
 
-            document.querySelectorAll('.suggest-again-btn').forEach(button => {
-                button.addEventListener('click', () => {
+            document.querySelectorAll(".suggest-again-btn").forEach(button => {
+                button.addEventListener("click", () => {
                     gerarRepertorio(button.dataset.tempo);
                 });
             });
         });
 
         async function gerarRepertorio(tempo) {
-            const listContainer = document.getElementById(`list-${tempo.replace(/\s+/g, '')}`);
-            listContainer.innerHTML = '<p>Gerando nova sugestão...</p>';
+            const listContainer = document.getElementById(`list-${tempo.replace(/\s+/g, "")}`);
+            listContainer.innerHTML = "<p>Gerando nova sugestão...</p>";
 
             try {
                 const response = await fetch(`https://biblioteca-musical-catolica.onrender.com/api/repertorio-aleatorio?tempo=${tempo}`);
-                if (!response.ok) throw new Error('Falha ao gerar repertório.');
+                if (!response.ok) throw new Error("Falha ao gerar repertório.");
 
                 const repertorio = await response.json();
-                listContainer.innerHTML = '';
+                listContainer.innerHTML = "";
 
                 // CORREÇÃO: Ordem dos momentos atualizada
-                const ordemMomentosMissa = ['Entrada', 'Ato Penitencial', 'Glória', 'Salmo', 'Aclamação', 'Ofertório', 'Santo', 'Cordeiro', 'Comunhão', 'Final'];
+                const ordemMomentosMissa = ["Entrada", "Ato Penitencial", "Glória", "Salmo", "Aclamação", "Ofertório", "Santo", "Cordeiro", "Comunhão", "Final"];
 
                 // Regra para Quaresma
-                const momentosFiltrados = tempo === 'Quaresma' ? ordemMomentosMissa.filter(m => m !== 'Glória') : ordemMomentosMissa;
+                const momentosFiltrados = tempo === "Quaresma" ? ordemMomentosMissa.filter(m => m !== "Glória") : ordemMomentosMissa;
 
                 momentosFiltrados.forEach(momento => {
-                    const musica = repertorio.find(m => m.momento === momento);
-                    const item = document.createElement('div');
-                    item.innerHTML = `<h4 class="repertorio-momento">${momento}</h4><ul><li>${musica ? `${musica.titulo} - <em>${musica.artista || 'Artista não informado'}</em>` : '<em>Nenhuma música encontrada</em>'}</li></ul>`;
+                    const musica = repertorio[momento]; // <--- AQUI ESTÁ A CORREÇÃO
+                    const item = document.createElement("div");
+                    item.innerHTML = `<h4 class="repertorio-momento">${momento}</h4><ul><li>${musica ? `${musica.titulo} - <em>${musica.artista || "Artista não informado"}</em>` : "<em>Nenhuma música encontrada</em>"}</li></ul>`;
                     listContainer.appendChild(item);
                 });
 
