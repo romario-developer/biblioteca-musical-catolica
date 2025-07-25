@@ -30,11 +30,31 @@
             <div class="search-bar-container">
                 <input type="text" id="search-input" placeholder="Buscar por título ou artista...">
             </div>
+            <div class="view-toggle">
+                <button id="grid-view-btn" class="active">Grade</button>
+                <button id="list-view-btn">Lista</button>
+            </div>
         </section>
 
         <section class="music-library">
             <div id="library-grid" class="shelf-grid">
                 <!-- Os cards das músicas serão inseridos aqui pelo JavaScript -->
+            </div>
+            <div id="library-list" class="music-list" style="display: none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Artista</th>
+                            <th>Tempo Litúrgico</th>
+                            <th>Momento</th>
+                            <th>Tom</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- As linhas da tabela serão inseridas aqui pelo JavaScript -->
+                    </tbody>
+                </table>
             </div>
             <p id="no-results-message" style="display: none; text-align: center; margin-top: 2rem;">Nenhuma música
                 encontrada.</p>
@@ -85,15 +105,21 @@
         document.addEventListener("DOMContentLoaded", () => {
             const searchInput = document.getElementById("search-input");
             const libraryGrid = document.getElementById("library-grid");
+            const libraryList = document.getElementById("library-list"); // Novo elemento da lista
             const noResultsMessage = document.getElementById("no-results-message");
             const musicDetailPanel = document.getElementById("music-detail-panel");
             const closePanelBtn = document.querySelector(".close-panel-btn");
-            const panelOverlay = document.getElementById("panel-overlay"); // Novo elemento overlay
-            let todasAsMusicas = []; // Array para guardar todas as músicas carregadas
+            const panelOverlay = document.getElementById("panel-overlay");
+            const gridViewBtn = document.getElementById("grid-view-btn"); // Botão de grade
+            const listViewBtn = document.getElementById("list-view-btn"); // Botão de lista
+            let todasAsMusicas = [];
+            let currentView = "grid"; // Estado inicial da visualização
 
-            // Função para renderizar os cards na tela
+            // Função para renderizar as músicas (adaptada para grade ou lista)
             function renderizarMusicas(musicas) {
-                libraryGrid.innerHTML = ""; // Limpa a grade
+                libraryGrid.innerHTML = "";
+                libraryList.querySelector("tbody").innerHTML = ""; // Limpa o corpo da tabela
+
                 if (musicas.length === 0) {
                     noResultsMessage.style.display = "block";
                 } else {
@@ -101,14 +127,13 @@
                 }
 
                 musicas.forEach(musica => {
-                    const card = document.createElement("div"); // Alterado para div para evitar navegação
+                    // Renderiza para a visualização em grade
+                    const card = document.createElement("div");
                     card.className = "category-card";
-                    card.dataset.id = musica._id; // Armazena o ID da música no dataset
-
+                    card.dataset.id = musica._id;
                     const artworkContent = musica.imageUrl
                         ? `<div class="card-artwork" style="background-image: url(\'${musica.imageUrl}\')"></div>`
                         : `<div class="card-artwork">🎵</div>`;
-
                     card.innerHTML = `
                         ${artworkContent}
                         <div class="card-info">
@@ -116,11 +141,31 @@
                             <div class="card-description">${musica.artista || "Artista não informado"}</div>
                         </div>
                     `;
+                    card.addEventListener("click", () => openMusicDetailPanel(musica));
                     libraryGrid.appendChild(card);
 
-                    // Adiciona o evento de clique para abrir o painel de detalhes
-                    card.addEventListener("click", () => openMusicDetailPanel(musica));
+                    // Renderiza para a visualização em lista (tabela)
+                    const row = document.createElement("tr");
+                    row.dataset.id = musica._id;
+                    row.innerHTML = `
+                        <td>${musica.titulo}</td>
+                        <td>${musica.artista || "Artista não informado"}</td>
+                        <td>${musica.tempo}</td>
+                        <td>${musica.momento}</td>
+                        <td>${musica.tom || "Não informado"}</td>
+                    `;
+                    row.addEventListener("click", () => openMusicDetailPanel(musica));
+                    libraryList.querySelector("tbody").appendChild(row);
                 });
+
+                // Exibe a visualização correta
+                if (currentView === "grid") {
+                    libraryGrid.style.display = "grid";
+                    libraryList.style.display = "none";
+                } else {
+                    libraryGrid.style.display = "none";
+                    libraryList.style.display = "block";
+                }
             }
 
             // Função para filtrar as músicas
@@ -138,17 +183,18 @@
             async function carregarTodaBiblioteca() {
                 try {
                     libraryGrid.innerHTML = "<p>Carregando biblioteca...</p>";
+                    libraryList.querySelector("tbody").innerHTML = "<tr><td colspan=\"5\">Carregando biblioteca...</td></tr>";
                     const response = await fetch("https://biblioteca-musical-catolica.onrender.com/api/musicas/all");
                     if (!response.ok) throw new Error("Falha ao carregar a biblioteca.");
 
                     todasAsMusicas = await response.json();
                     renderizarMusicas(todasAsMusicas);
 
-                    // Adiciona o "ouvinte" do evento de digitação APÓS carregar os dados
                     searchInput.addEventListener("input", filtrarMusicas);
 
                 } catch (error) {
                     libraryGrid.innerHTML = `<p style="color: red;">${error.message}</p>`;
+                    libraryList.querySelector("tbody").innerHTML = `<tr><td colspan=\"5\" style=\"color: red;\">${error.message}</td></tr>`;
                 }
             }
 
@@ -171,22 +217,32 @@
                 document.getElementById("btn-download").style.display = musica.downloadUrl ? "block" : "none";
 
                 musicDetailPanel.classList.add("active");
-                panelOverlay.classList.add("active"); // Ativa o overlay
+                panelOverlay.classList.add("active");
             }
 
             // Função para fechar o painel de detalhes da música
             function closeMusicDetailPanel() {
                 musicDetailPanel.classList.remove("active");
-                panelOverlay.classList.remove("active"); // Desativa o overlay
+                panelOverlay.classList.remove("active");
             }
 
-            // Event listener para o botão de fechar o painel
+            // Event listeners para os botões de visualização
+            gridViewBtn.addEventListener("click", () => {
+                currentView = "grid";
+                gridViewBtn.classList.add("active");
+                listViewBtn.classList.remove("active");
+                renderizarMusicas(todasAsMusicas); // Renderiza novamente para aplicar a visualização
+            });
+
+            listViewBtn.addEventListener("click", () => {
+                currentView = "list";
+                listViewBtn.classList.add("active");
+                gridViewBtn.classList.remove("active");
+                renderizarMusicas(todasAsMusicas); // Renderiza novamente para aplicar a visualização
+            });
+
             closePanelBtn.addEventListener("click", closeMusicDetailPanel);
-
-            // Event listener para fechar o painel ao clicar no overlay
             panelOverlay.addEventListener("click", closeMusicDetailPanel);
-
-            // Previne que o clique dentro do painel feche-o (event bubbling)
             musicDetailPanel.addEventListener("click", (event) => {
                 event.stopPropagation();
             });

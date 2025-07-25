@@ -109,7 +109,7 @@ h3,
 /* Seção Hero */
 .hero-section {
     height: 50vh;
-    background: linear-gradient(to top, var(--bg-primary) 5%, transparent 50%), url('https://images.unsplash.com/photo-1516258242369-933606354238?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+    background: linear-gradient(to top, var(--bg-primary) 5%, transparent 50%), url('https://images.unsplash.com/photo-1516258242369-933606354238?q=80&w=2070&auto=format&fit=crop' ) no-repeat center center;
     background-size: cover;
     display: flex;
     flex-direction: column;
@@ -888,4 +888,131 @@ h3,
         width: 100%;
         right: -100%;
     }
+}
+
+/* Estilos para os botões de alternância de visualização */
+.view-toggle {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.view-toggle button {
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--bg-secondary);
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.view-toggle button:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.view-toggle button:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.view-toggle button:hover {
+    background-color: #4A5568;
+    color: var(--text-primary);
+}
+
+.view-toggle button.active {
+    background-color: var(--accent-color);
+    color: var(--bg-primary);
+    border-color: var(--accent-color);
+}
+
+/* Estilos para a visualização em lista (tabela) */
+.music-list {
+    width: 100%;
+    overflow-x: auto; /* Para tabelas responsivas em telas menores */
+}
+
+.music-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.music-list th,
+.music-list td {
+    text-align: left;
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.music-list th {
+    background-color: #2D3748;
+    color: var(--accent-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.music-list td {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.music-list tbody tr:hover {
+    background-color: #4A5568;
+    cursor: pointer;
+}
+
+/* Responsividade para a tabela */
+@media (max-width: 768px) {
+    .music-list table,
+    .music-list thead,
+    .music-list tbody,
+    .music-list th,
+    .music-list td,
+    .music-list tr {
+        display: block;
+    }
+
+    .music-list thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    .music-list tr {
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .music-list td {
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+    }
+
+    .music-list td:before {
+        position: absolute;
+        top: 0;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: 600;
+        color: var(--accent-color);
+    }
+
+    .music-list td:nth-of-type(1):before { content: "Título:"; }
+    .music-list td:nth-of-type(2):before { content: "Artista:"; }
+    .music-list td:nth-of-type(3):before { content: "Tempo Litúrgico:"; }
+    .music-list td:nth-of-type(4):before { content: "Momento:"; }
+    .music-list td:nth-of-type(5):before { content: "Tom:"; }
 }
